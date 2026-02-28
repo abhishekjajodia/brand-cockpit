@@ -143,6 +143,135 @@
   }
   .logout-btn:hover { color: var(--red); }
 
+  /* ── Date Picker ── */
+  .date-picker-wrap {
+    position: relative;
+  }
+  .date-picker-btn {
+    background: var(--bg-card); border: 1px solid var(--border); color: var(--text);
+    padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer;
+    font-family: inherit; display: flex; align-items: center; gap: 8px;
+    white-space: nowrap;
+  }
+  .date-picker-btn:hover { border-color: var(--accent); }
+  .date-picker-btn .dp-icon { font-size: 14px; opacity: 0.6; }
+  .date-picker-btn .dp-caret { font-size: 10px; opacity: 0.4; }
+
+  .dp-dropdown {
+    display: none; position: fixed;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 12px; box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+    z-index: 1000; min-width: 520px; overflow: hidden;
+  }
+  .dp-dropdown.open { display: flex; }
+
+  .dp-presets {
+    width: 160px; padding: 12px 0; border-right: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .dp-preset {
+    display: block; width: 100%; padding: 8px 16px;
+    background: none; border: none; color: var(--text-muted);
+    font-size: 12px; font-family: inherit; cursor: pointer;
+    text-align: left; transition: all 0.15s;
+  }
+  .dp-preset:hover { background: var(--bg-card-hover); color: var(--text); }
+  .dp-preset.active { background: var(--accent); color: #fff; }
+
+  .dp-right {
+    flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 12px;
+  }
+  .dp-tabs {
+    display: flex; gap: 0; border-radius: 8px; overflow: hidden;
+    border: 1px solid var(--border); width: fit-content;
+  }
+  .dp-tab-btn {
+    padding: 6px 16px; background: none; border: none;
+    color: var(--text-muted); font-size: 12px; cursor: pointer; font-family: inherit;
+  }
+  .dp-tab-btn.active { background: var(--bg-card-hover); color: var(--text); }
+
+  .dp-rolling {
+    display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted);
+  }
+  .dp-rolling input {
+    width: 64px; padding: 6px 10px; border-radius: 6px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); font-size: 13px; font-family: 'JetBrains Mono';
+    text-align: center; outline: none;
+  }
+  .dp-rolling input:focus { border-color: var(--accent); }
+  .dp-rolling select {
+    padding: 6px 10px; border-radius: 6px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); font-size: 13px; font-family: inherit;
+    outline: none; cursor: pointer;
+  }
+
+  .dp-calendars {
+    display: flex; gap: 16px;
+  }
+  .dp-cal {
+    flex: 1;
+  }
+  .dp-cal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 8px; font-size: 13px; font-weight: 600;
+  }
+  .dp-cal-nav {
+    background: none; border: none; color: var(--text-muted);
+    cursor: pointer; font-size: 14px; padding: 4px 8px; border-radius: 4px;
+  }
+  .dp-cal-nav:hover { color: var(--text); background: var(--bg-card-hover); }
+  .dp-cal-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;
+    font-size: 11px;
+  }
+  .dp-cal-grid .dp-dow {
+    text-align: center; color: var(--text-dim); font-weight: 500;
+    padding: 4px 0; font-size: 10px;
+  }
+  .dp-day {
+    text-align: center; padding: 5px 2px; border-radius: 6px;
+    cursor: pointer; color: var(--text-muted); transition: all 0.1s;
+    font-size: 11px;
+  }
+  .dp-day:hover { background: var(--bg-card-hover); color: var(--text); }
+  .dp-day.in-range { background: rgba(99,102,241,0.15); color: var(--text); }
+  .dp-day.start, .dp-day.end { background: var(--accent); color: #fff; font-weight: 600; }
+  .dp-day.today { border: 1px solid var(--accent); }
+  .dp-day.other-month { opacity: 0.3; }
+  .dp-day.future { opacity: 0.2; cursor: default; }
+
+  .dp-actions {
+    display: flex; justify-content: flex-end; gap: 8px;
+    padding-top: 8px; border-top: 1px solid var(--border);
+  }
+  .dp-action-btn {
+    padding: 7px 18px; border-radius: 6px; font-size: 12px;
+    font-family: inherit; cursor: pointer; font-weight: 500;
+  }
+  .dp-cancel {
+    background: none; border: 1px solid var(--border); color: var(--text-muted);
+  }
+  .dp-cancel:hover { border-color: var(--text-muted); color: var(--text); }
+  .dp-apply {
+    background: var(--accent); border: none; color: #fff;
+  }
+  .dp-apply:hover { background: var(--accent-light); }
+
+  .dp-fixed-row {
+    display: none; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted);
+  }
+  .dp-fixed-row.active { display: flex; }
+  .dp-fixed-input {
+    padding: 6px 10px; border-radius: 6px;
+    background: var(--bg); border: 1px solid var(--border);
+    color: var(--text); font-size: 12px; font-family: 'JetBrains Mono';
+    outline: none; width: 120px;
+  }
+  .dp-fixed-input:focus { border-color: var(--accent); }
+
   /* ── Hero ── */
   .hero {
     padding: 60px 0 40px;
@@ -484,6 +613,41 @@
     <a href="#funnel" class="nav-tab" onclick="scrollTo_(event,'funnel')">Funnel</a>
     <a href="#alerts" class="nav-tab" onclick="scrollTo_(event,'alerts')">Alerts</a>
     <div class="nav-right">
+      <div class="date-picker-wrap" id="datePickerWrap">
+        <button class="date-picker-btn" onclick="toggleDatePicker()">
+          <span class="dp-icon">&#128197;</span>
+          <span id="dpLabel">Last 14 days</span>
+          <span class="dp-caret">&#9662;</span>
+        </button>
+        <div class="dp-dropdown" id="dpDropdown">
+          <div class="dp-presets" id="dpPresets"></div>
+          <div class="dp-right">
+            <div class="dp-tabs">
+              <button class="dp-tab-btn active" data-tab="rolling" onclick="setDpTab('rolling')">Rolling</button>
+              <button class="dp-tab-btn" data-tab="fixed" onclick="setDpTab('fixed')">Fixed</button>
+            </div>
+            <div class="dp-rolling" id="dpRolling">
+              <span>Last</span>
+              <input type="number" id="dpRollingVal" value="14" min="1" max="365">
+              <select id="dpRollingUnit">
+                <option value="days">Days</option>
+                <option value="months">Months</option>
+              </select>
+            </div>
+            <div class="dp-fixed-row" id="dpFixed">
+              <span>From</span>
+              <input type="date" class="dp-fixed-input" id="dpStartDate">
+              <span>to</span>
+              <input type="date" class="dp-fixed-input" id="dpEndDate">
+            </div>
+            <div class="dp-calendars" id="dpCalendars"></div>
+            <div class="dp-actions">
+              <button class="dp-action-btn dp-cancel" onclick="closeDatePicker()">Cancel</button>
+              <button class="dp-action-btn dp-apply" onclick="applyDatePicker()">Apply</button>
+            </div>
+          </div>
+        </div>
+      </div>
       <span class="last-refresh" id="lastRefresh"></span>
       <button class="refresh-btn" onclick="refreshDashboard()">&#8635; Refresh</button>
       <button class="logout-btn" onclick="handleLogout()">Sign out</button>
@@ -637,6 +801,191 @@ const WORKSPACE_ID = 'de8e2554-729a-422e-894d-ce399eca3a41';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let DATA = { daily: [], creatives: [], actionColors: {}, phaseColors: {} };
 
+// ── Date Picker State ──
+let dpMode = 'rolling'; // 'rolling' or 'fixed'
+let dpDays = 14;
+let dpStartDate = null;
+let dpEndDate = null;
+let dpSelecting = null; // null, 'start', 'end'
+let dpCalMonth1 = null; // Date for left calendar
+let dpCalMonth2 = null; // Date for right calendar
+let dpTempStart = null;
+let dpTempEnd = null;
+
+const DP_PRESETS = [
+  { label: 'Last 7 days', days: 7 },
+  { label: 'Last 14 days', days: 14 },
+  { label: 'Last 30 days', days: 30 },
+  { label: 'Last 60 days', days: 60 },
+  { label: 'Last 90 days', days: 90 },
+  { label: 'Last 12 months', days: 365 },
+];
+
+function initDatePicker() {
+  const presets = document.getElementById('dpPresets');
+  presets.innerHTML = DP_PRESETS.map((p, i) =>
+    `<button class="dp-preset${p.days === dpDays ? ' active' : ''}" data-days="${p.days}" onclick="selectPreset(${p.days})">${p.label}</button>`
+  ).join('');
+
+  const now = new Date();
+  dpCalMonth2 = new Date(now.getFullYear(), now.getMonth(), 1);
+  dpCalMonth1 = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+
+  // Set fixed date inputs
+  const end = new Date();
+  const start = new Date();
+  start.setDate(start.getDate() - dpDays);
+  document.getElementById('dpStartDate').value = fmtDateInput(start);
+  document.getElementById('dpEndDate').value = fmtDateInput(end);
+  document.getElementById('dpEndDate').max = fmtDateInput(end);
+
+  renderCalendars();
+}
+
+function fmtDateInput(d) {
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function fmtDateLabel(d) {
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+}
+
+function toggleDatePicker() {
+  const dd = document.getElementById('dpDropdown');
+  if (dd.classList.contains('open')) { closeDatePicker(); return; }
+  // Position dropdown below button using fixed positioning
+  const btn = document.querySelector('.date-picker-btn');
+  const rect = btn.getBoundingClientRect();
+  dd.style.top = (rect.bottom + 8) + 'px';
+  dd.style.right = (window.innerWidth - rect.right) + 'px';
+  dd.classList.add('open');
+  initDatePicker();
+  // Close on outside click
+  setTimeout(() => document.addEventListener('click', closeDpOutside), 10);
+}
+
+function closeDatePicker() {
+  document.getElementById('dpDropdown').classList.remove('open');
+  document.removeEventListener('click', closeDpOutside);
+}
+
+function closeDpOutside(e) {
+  if (!document.getElementById('datePickerWrap').contains(e.target)) closeDatePicker();
+}
+
+function setDpTab(tab) {
+  dpMode = tab;
+  document.querySelectorAll('.dp-tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('dpRolling').style.display = tab === 'rolling' ? 'flex' : 'none';
+  const fixedRow = document.getElementById('dpFixed');
+  fixedRow.classList.toggle('active', tab === 'fixed');
+  if (tab === 'fixed') {
+    // Init temp dates from current selection
+    const end = new Date();
+    const start = new Date(); start.setDate(start.getDate() - dpDays);
+    dpTempStart = start; dpTempEnd = end;
+    document.getElementById('dpStartDate').value = fmtDateInput(start);
+    document.getElementById('dpEndDate').value = fmtDateInput(end);
+    renderCalendars();
+  }
+}
+
+function selectPreset(days) {
+  dpMode = 'rolling';
+  dpDays = days;
+  document.querySelectorAll('.dp-preset').forEach(b => b.classList.toggle('active', Number(b.dataset.days) === days));
+  document.getElementById('dpRollingVal').value = days;
+  document.getElementById('dpRollingUnit').value = 'days';
+  setDpTab('rolling');
+  // Auto-apply preset
+  applyDatePicker();
+}
+
+function renderCalendars() {
+  const wrap = document.getElementById('dpCalendars');
+  if (dpMode !== 'fixed') { wrap.innerHTML = ''; return; }
+
+  const today = new Date(); today.setHours(0,0,0,0);
+
+  function renderMonth(date, showPrev, showNext) {
+    const year = date.getFullYear(), month = date.getMonth();
+    const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const firstDay = new Date(year, month, 1).getDay(); // 0=Sun
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    let html = `<div class="dp-cal">
+      <div class="dp-cal-header">
+        ${showPrev ? `<button class="dp-cal-nav" onclick="shiftCal(-1)">&#8592;</button>` : '<span></span>'}
+        <span>${months[month]} ${year}</span>
+        ${showNext ? `<button class="dp-cal-nav" onclick="shiftCal(1)">&#8594;</button>` : '<span></span>'}
+      </div>
+      <div class="dp-cal-grid">
+        <div class="dp-dow">Su</div><div class="dp-dow">Mo</div><div class="dp-dow">Tu</div>
+        <div class="dp-dow">We</div><div class="dp-dow">Th</div><div class="dp-dow">Fr</div><div class="dp-dow">Sa</div>`;
+
+    // Blanks for days before 1st
+    for (let i = 0; i < firstDay; i++) html += `<div class="dp-day other-month"></div>`;
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dt = new Date(year, month, d);
+      let cls = 'dp-day';
+      if (dt > today) cls += ' future';
+      if (dt.toDateString() === today.toDateString()) cls += ' today';
+      if (dpTempStart && dt.toDateString() === dpTempStart.toDateString()) cls += ' start';
+      if (dpTempEnd && dt.toDateString() === dpTempEnd.toDateString()) cls += ' end';
+      if (dpTempStart && dpTempEnd && dt > dpTempStart && dt < dpTempEnd) cls += ' in-range';
+      const clickable = dt <= today;
+      html += `<div class="${cls}" ${clickable ? `onclick="pickDay(${year},${month},${d})"` : ''}>${d}</div>`;
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  wrap.innerHTML = renderMonth(dpCalMonth1, true, false) + renderMonth(dpCalMonth2, false, true);
+}
+
+function shiftCal(dir) {
+  dpCalMonth1 = new Date(dpCalMonth1.getFullYear(), dpCalMonth1.getMonth() + dir, 1);
+  dpCalMonth2 = new Date(dpCalMonth1.getFullYear(), dpCalMonth1.getMonth() + 1, 1);
+  renderCalendars();
+}
+
+function pickDay(y, m, d) {
+  const dt = new Date(y, m, d);
+  if (!dpTempStart || (dpTempStart && dpTempEnd)) {
+    dpTempStart = dt; dpTempEnd = null;
+  } else {
+    if (dt < dpTempStart) { dpTempEnd = dpTempStart; dpTempStart = dt; }
+    else dpTempEnd = dt;
+  }
+  if (dpTempStart) document.getElementById('dpStartDate').value = fmtDateInput(dpTempStart);
+  if (dpTempEnd) document.getElementById('dpEndDate').value = fmtDateInput(dpTempEnd);
+  renderCalendars();
+}
+
+function applyDatePicker() {
+  if (dpMode === 'rolling') {
+    let val = parseInt(document.getElementById('dpRollingVal').value) || 14;
+    const unit = document.getElementById('dpRollingUnit').value;
+    if (unit === 'months') val = val * 30;
+    dpDays = val;
+    dpStartDate = null; dpEndDate = null;
+    document.getElementById('dpLabel').textContent = `Last ${val} days`;
+  } else {
+    // Fixed mode
+    const s = document.getElementById('dpStartDate').value;
+    const e = document.getElementById('dpEndDate').value;
+    if (s && e) {
+      dpStartDate = s; dpEndDate = e;
+      dpDays = null;
+      document.getElementById('dpLabel').textContent = fmtDateLabel(new Date(s)) + ' – ' + fmtDateLabel(new Date(e));
+    }
+  }
+  closeDatePicker();
+  refreshDashboard();
+}
+
 // ── Auth ──
 async function checkSession() {
   const { data: { session } } = await sb.auth.getSession();
@@ -735,8 +1084,21 @@ function computePortfolioHealth(creatives) {
 async function loadDashboard() {
   document.getElementById('loadingOverlay').classList.remove('hidden');
 
+  // Build daily params based on date picker (fetch 2x for comparison)
+  const dailyParams = { p_account_id: ACCOUNT_ID };
+  if (dpStartDate && dpEndDate) {
+    // For fixed range, compute duration and fetch 2x for prior comparison
+    const startD = new Date(dpStartDate), endD = new Date(dpEndDate);
+    const rangeDays = Math.ceil((endD - startD) / 86400000) + 1;
+    const extStart = new Date(startD); extStart.setDate(extStart.getDate() - rangeDays);
+    dailyParams.p_start_date = fmtDateInput(extStart);
+    dailyParams.p_end_date = dpEndDate;
+  } else {
+    dailyParams.p_days = (dpDays || 30) * 2; // fetch 2x for prior period comparison
+  }
+
   const [dailyRes, creativesRes, ad7dRes] = await Promise.all([
-    sb.rpc('dashboard_daily', { p_account_id: ACCOUNT_ID, p_days: 30 }),
+    sb.rpc('dashboard_daily', dailyParams),
     sb.rpc('dashboard_creatives', { p_workspace_id: WORKSPACE_ID }),
     sb.rpc('dashboard_ad_7d', { p_account_id: ACCOUNT_ID, p_limit: 200 })
   ]);
@@ -818,7 +1180,8 @@ function renderDashboard() {
 function renderHero() {
   const count = DATA.creatives.length;
   const portfolioHealth = computePortfolioHealth(DATA.creatives);
-  document.getElementById('heroSub').textContent = `Live performance intelligence for ${count} active creatives \u2022 Last 14 days`;
+  const periodLabel = document.getElementById('dpLabel').textContent;
+  document.getElementById('heroSub').textContent = `Live performance intelligence for ${count} active creatives \u2022 ${periodLabel}`;
   document.getElementById('portfolioScore').textContent = portfolioHealth + '/100';
 }
 
@@ -826,16 +1189,19 @@ function renderHero() {
 function renderKPIs() {
   const d = DATA.daily;
   if (!d.length) return;
-  const last14 = d.slice(-14);
-  const prior14 = d.length >= 28 ? d.slice(-28, -14) : d.slice(0, Math.max(1, d.length - 14));
+  // Split data in half: current period vs prior period
+  const half = Math.ceil(d.length / 2);
+  const curPeriod = d.slice(-half);
+  const priorPeriod = d.slice(0, d.length - half);
+  const periodDays = curPeriod.length;
 
   const sum = (arr, key) => arr.reduce((s, r) => s + (Number(r[key]) || 0), 0);
-  const curSpend = sum(last14, 'spend');
-  const priorSpend = sum(prior14, 'spend');
-  const curPurchases = sum(last14, 'purchases');
-  const priorPurchases = sum(prior14, 'purchases');
-  const curRevenue = sum(last14, 'revenue');
-  const priorRevenue = sum(prior14, 'revenue');
+  const curSpend = sum(curPeriod, 'spend');
+  const priorSpend = sum(priorPeriod, 'spend');
+  const curPurchases = sum(curPeriod, 'purchases');
+  const priorPurchases = sum(priorPeriod, 'purchases');
+  const curRevenue = sum(curPeriod, 'revenue');
+  const priorRevenue = sum(priorPeriod, 'revenue');
   const curRoas = curSpend > 0 ? curRevenue / curSpend : 0;
   const priorRoas = priorSpend > 0 ? priorRevenue / priorSpend : 0;
   const curCpp = curPurchases > 0 ? curSpend / curPurchases : 0;
@@ -849,7 +1215,7 @@ function renderKPIs() {
   };
 
   const kpis = [
-    { label: 'Spend (14d)', val: fmtCurrency(curSpend), delta: delta(curSpend, priorSpend), sparkId: 'spark-spend', invert: true },
+    { label: `Spend (${periodDays}d)`, val: fmtCurrency(curSpend), delta: delta(curSpend, priorSpend), sparkId: 'spark-spend', invert: true },
     { label: 'ROAS', val: curRoas.toFixed(2) + 'x', delta: delta(curRoas, priorRoas), sparkId: 'spark-roas' },
     { label: 'Cost/Purchase', val: fmtCurrency(curCpp), delta: delta(curCpp, priorCpp), sparkId: 'spark-cpp', invert: true },
     { label: 'Purchases', val: curPurchases, delta: delta(curPurchases, priorPurchases), sparkId: 'spark-purchases' },
@@ -1016,7 +1382,7 @@ function renderTable() {
 
 // ── Funnel ──
 function renderFunnel() {
-  const d = DATA.daily.slice(-14);
+  const d = DATA.daily;
   const sum = (key) => d.reduce((s, r) => s + (Number(r[key]) || 0), 0);
 
   const steps = [
