@@ -2525,15 +2525,15 @@ function openCreativeModal(adId) {
   const mediaEl = document.getElementById('modalMedia');
   const detailsEl = document.getElementById('modalDetails');
 
-  const vertThumb = c.vertical_thumbnail_url;
-  const hdThumb = vertThumb || c.hd_thumbnail_url || c.image_url || c.thumb;
+  const hasReels = !!c.vertical_thumbnail_url;
+  const hdThumb = hasReels ? c.vertical_thumbnail_url : (c.hd_thumbnail_url || c.image_url || c.thumb);
   const isVideo = !!c.video_id;
   const videoSrc = c.video_source_url || '';
   const fbVideoUrl = c.video_id ? `https://www.facebook.com/ads/library/?id=${adId}` : '';
   const durationLabel = c.video_duration ? Number(c.video_duration).toFixed(0) + 's' : '';
 
-  // Detect vertical/reel format — video ads or images with reel-like aspect
-  const isVertical = isVideo || (c.format || '').toLowerCase() === 'video';
+  // Only use tall vertical modal for ads with a 9:16 reels version
+  const isVertical = hasReels;
   modalBox.classList.toggle('modal-vertical', isVertical);
 
   if (isVideo && hdThumb) {
