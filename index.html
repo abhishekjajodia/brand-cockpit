@@ -786,10 +786,12 @@
     display: grid; grid-template-columns: 1fr 1fr; gap: 0;
   }
   .modal.modal-vertical {
-    max-width: 1060px; grid-template-columns: 400px 1fr;
+    max-width: 1060px; grid-template-columns: 420px 1fr;
+    height: 88vh; max-height: 88vh; overflow-y: hidden;
   }
-  .modal.modal-vertical .modal-media { min-height: 700px; }
-  .modal.modal-vertical .modal-media iframe { min-height: 700px !important; }
+  .modal.modal-vertical .modal-media { min-height: unset; height: 100%; }
+  .modal.modal-vertical .modal-media iframe { height: 100% !important; min-height: unset !important; }
+  .modal.modal-vertical .modal-details { max-height: 88vh; }
   .modal-media {
     background: #000; border-radius: 16px 0 0 16px; display: flex;
     align-items: center; justify-content: center; min-height: 400px;
@@ -846,9 +848,9 @@
   .modal-btn:hover { border-color: var(--accent); color: var(--accent); }
   .modal-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
   @media (max-width: 768px) {
-    .modal, .modal.modal-vertical { grid-template-columns: 1fr; max-width: 95%; }
+    .modal, .modal.modal-vertical { grid-template-columns: 1fr; max-width: 95%; height: auto; max-height: 90vh; overflow-y: auto; }
     .modal-media { border-radius: 16px 16px 0 0; min-height: 250px; }
-    .modal.modal-vertical .modal-media { min-height: 500px; }
+    .modal.modal-vertical .modal-media { height: 60vh; }
   }
 </style>
 </head>
@@ -2550,7 +2552,7 @@ function openCreativeModal(adId) {
     // Embedded Facebook video player
     const embedUrl = `https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=${c.video_id}&show_text=false&width=480`;
     mediaEl.innerHTML = `<div class="modal-video-wrap" style="background:#000">
-      <iframe src="${embedUrl}" width="100%" height="100%" style="border:none;overflow:hidden;min-height:700px" scrolling="no" frameborder="0" allowTransparency="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>
+      <iframe src="${embedUrl}" width="100%" height="100%" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>
       ${durationLabel ? `<div class="video-meta-badge">\uD83C\uDFA5 ${durationLabel}</div>` : ''}
     </div>`;
   } else if (hdThumb) {
