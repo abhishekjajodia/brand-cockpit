@@ -1552,14 +1552,12 @@ async function loadDashboard() {
   const now = new Date();
   document.getElementById('lastRefresh').textContent = 'Updated ' + now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
-  // Default to table view
-  setTimeout(() => {
-    document.getElementById('table').scrollIntoView({ behavior: 'auto' });
-    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
-    const tableTab = document.querySelector('a[href="#table"]');
-    if (tableTab) tableTab.classList.add('active');
-    sortTable(3);
-  }, 100);
+  // Default sort for table (but stay at top of page)
+  sortTable(3);
+  // Ensure Overview tab is active on load
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  const overviewTab = document.querySelector('a[href="#overview"]');
+  if (overviewTab) overviewTab.classList.add('active');
 }
 
 async function refreshDashboard() {
