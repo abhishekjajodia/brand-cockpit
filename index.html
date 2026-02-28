@@ -545,6 +545,29 @@
     font-size: 13px;
   }
 
+  /* ── Audience Segments ── */
+  .audience-tabs { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .audience-tab {
+    padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--bg-card); color: var(--text-muted); cursor: pointer;
+    font-size: 13px; font-family: inherit; transition: all 0.15s;
+  }
+  .audience-tab:hover { border-color: var(--accent); color: var(--text); }
+  .audience-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .audience-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .segment-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; transition: all 0.2s;
+  }
+  .segment-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .segment-name { font-size: 15px; font-weight: 700; margin-bottom: 4px; text-transform: capitalize; }
+  .segment-share { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; }
+  .segment-bar-wrap { height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 16px; overflow: hidden; }
+  .segment-bar { height: 100%; border-radius: 3px; transition: width 0.4s ease; }
+  .segment-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .segment-metric-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 2px; }
+  .segment-metric-value { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 600; }
+
   /* ── Alerts ── */
   .alerts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
   .alert-card {
@@ -673,6 +696,7 @@
     <a href="#swimlanes" class="nav-tab" onclick="scrollTo_(event,'swimlanes')">Swim Lanes</a>
     <a href="#table" class="nav-tab active" onclick="scrollTo_(event,'table')">Table</a>
     <a href="#funnel" class="nav-tab" onclick="scrollTo_(event,'funnel')">Funnel</a>
+    <a href="#audience" class="nav-tab" onclick="scrollTo_(event,'audience')">Audience</a>
     <a href="#alerts" class="nav-tab" onclick="scrollTo_(event,'alerts')">Alerts</a>
     <div class="nav-right">
       <div class="date-picker-wrap" id="datePickerWrap">
@@ -825,6 +849,24 @@
     <div class="section-line"></div>
   </div>
   <div class="funnel-wrap fade-in" id="funnelWrap"></div>
+</div>
+</section>
+
+<!-- Audience Segments -->
+<section id="audience" class="section">
+<div class="container">
+  <div class="section-header fade-in">
+    <h2>Audience Segments</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="audience-tabs fade-in" id="audienceTabs">
+    <button class="audience-tab active" onclick="switchAudienceTab(this,'age')">Age</button>
+    <button class="audience-tab" onclick="switchAudienceTab(this,'gender')">Gender</button>
+    <button class="audience-tab" onclick="switchAudienceTab(this,'publisher_platform')">Platform</button>
+    <button class="audience-tab" onclick="switchAudienceTab(this,'device_platform')">Device</button>
+    <button class="audience-tab" onclick="switchAudienceTab(this,'country')">Country</button>
+  </div>
+  <div id="audienceContainer" class="fade-in"></div>
 </div>
 </section>
 
@@ -1228,15 +1270,25 @@ async function loadDashboard() {
     dailyParams.p_days = (dpDays || 30) * 2; // fetch 2x for prior period comparison
   }
 
-  const [dailyRes, creativesRes, ad7dRes] = await Promise.all([
+  const breakdownParams = { p_account_id: currentWorkspace.meta_ad_account };
+  if (dpStartDate && dpEndDate) {
+    breakdownParams.p_start_date = dpStartDate;
+    breakdownParams.p_end_date = dpEndDate;
+  } else {
+    breakdownParams.p_days = dpDays || 30;
+  }
+
+  const [dailyRes, creativesRes, ad7dRes, breakdownRes] = await Promise.all([
     sb.rpc('dashboard_daily', dailyParams),
     sb.rpc('dashboard_creatives', { p_workspace_id: currentWorkspace.workspace_id }),
-    sb.rpc('dashboard_ad_7d', { p_account_id: currentWorkspace.meta_ad_account, p_limit: 200 })
+    sb.rpc('dashboard_ad_7d', { p_account_id: currentWorkspace.meta_ad_account, p_limit: 200 }),
+    sb.rpc('dashboard_breakdown', breakdownParams)
   ]);
 
   if (dailyRes.error) { console.error('daily error:', dailyRes.error); }
   if (creativesRes.error) { console.error('creatives error:', creativesRes.error); }
   if (ad7dRes.error) { console.error('ad7d error:', ad7dRes.error); }
+  if (breakdownRes.error) { console.error('breakdown error:', breakdownRes.error); }
 
   const ad7d = {};
   (ad7dRes.data || []).forEach(r => { ad7d[r.ad_id] = r; });
@@ -1249,6 +1301,7 @@ async function loadDashboard() {
   DATA = {
     daily: dailyRes.data || [],
     creatives,
+    breakdown: breakdownRes.data || [],
     actionColors: { SCALE: '#3b82f6', MAINTAIN: '#22c55e', WATCH: '#eab308', KILL: '#ef4444', TEST: '#a855f7', MONITOR: '#71717a' },
     phaseColors: { scaling: '#8b5cf6', peak: '#22c55e', learning: '#3b82f6', declining: '#eab308', fatigued: '#ef4444', paused: '#71717a' }
   };
@@ -1299,6 +1352,7 @@ function renderDashboard() {
   renderSwimLanes();
   renderTable();
   renderFunnel();
+  renderAudienceSegments();
   renderAlerts();
   renderFooter();
   initSparklines();
@@ -1566,6 +1620,49 @@ function renderFunnel() {
       ${worstLeak ? `<div class="worst-leak"><strong>Biggest leak:</strong> ${worstLeak.from} \u2192 ${worstLeak.to} (${worstLeak.drop}% drop)</div>` : ''}
     </div>
   `;
+}
+
+// ── Audience Segments ──
+function renderAudienceSegments(type) {
+  type = type || 'age';
+  const rows = (DATA.breakdown || []).filter(r => r.breakdown_type === type && r.spend > 0);
+  const totalSpend = rows.reduce((s, r) => s + Number(r.spend), 0) || 1;
+  const container = document.getElementById('audienceContainer');
+  if (!rows.length) {
+    container.innerHTML = '<p style="color:var(--text-muted)">No audience data for this period.</p>';
+    return;
+  }
+
+  const nameMap = { mobile_app: 'Mobile App', mobile_web: 'Mobile Web', desktop: 'Desktop',
+    instagram: 'Instagram', facebook: 'Facebook', messenger: 'Messenger', threads: 'Threads',
+    audience_network: 'Audience Network', unknown: 'Unknown', IN: 'India', US: 'United States' };
+
+  function roasColor(r) { return r >= 2 ? '#22c55e' : r >= 1.5 ? '#3b82f6' : r >= 1 ? '#eab308' : '#ef4444'; }
+  function fmtM(v) { v = Number(v); if (v >= 100000) return (v/100000).toFixed(1) + 'L'; if (v >= 1000) return (v/1000).toFixed(1) + 'K'; return v.toFixed(0); }
+
+  container.innerHTML = '<div class="audience-grid">' + rows.map(r => {
+    const pct = ((Number(r.spend) / totalSpend) * 100).toFixed(1);
+    const rc = roasColor(Number(r.roas));
+    const name = nameMap[r.breakdown_value] || r.breakdown_value;
+    const cpp = Number(r.purchases) > 0 ? (Number(r.spend) / Number(r.purchases)).toFixed(0) : '—';
+    return `<div class="segment-card">
+      <div class="segment-name">${name}</div>
+      <div class="segment-share">${pct}% of spend</div>
+      <div class="segment-bar-wrap"><div class="segment-bar" style="width:${pct}%;background:${rc}"></div></div>
+      <div class="segment-metrics">
+        <div><div class="segment-metric-label">Spend</div><div class="segment-metric-value">\u20B9${fmtM(r.spend)}</div></div>
+        <div><div class="segment-metric-label">ROAS</div><div class="segment-metric-value" style="color:${rc}">${Number(r.roas).toFixed(2)}x</div></div>
+        <div><div class="segment-metric-label">Purchases</div><div class="segment-metric-value">${Number(r.purchases).toLocaleString()}</div></div>
+        <div><div class="segment-metric-label">Cost/Purchase</div><div class="segment-metric-value">${cpp === '—' ? '—' : '\u20B9' + fmtM(cpp)}</div></div>
+      </div>
+    </div>`;
+  }).join('') + '</div>';
+}
+
+function switchAudienceTab(btn, type) {
+  document.querySelectorAll('.audience-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderAudienceSegments(type);
 }
 
 // ── Alerts ──
