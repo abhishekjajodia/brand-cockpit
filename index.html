@@ -2535,10 +2535,22 @@ function openCreativeModal(adId) {
   const isVertical = isVideo || (c.format || '').toLowerCase() === 'video';
   modalBox.classList.toggle('modal-vertical', isVertical);
 
-  if (isVideo && videoSrc) {
-    // Direct video playback (when source URL available)
+  if (isVideo && hdThumb) {
+    // Show vertical thumbnail with play overlay — click plays video inline or opens FB
+    const playAction = videoSrc
+      ? `onclick="playModalVideo(this, '${videoSrc.replace(/'/g, "\\'")}')"`
+      : (c.video_id ? `onclick="window.open('https://www.facebook.com/ads/library/?id=${adId}','_blank')"` : '');
     mediaEl.innerHTML = `<div class="modal-video-wrap">
-      <video id="modalVideo" poster="${hdThumb || ''}" preload="metadata" playsinline>
+      <img id="modalThumb" src="${hdThumb}" alt="" style="width:100%;height:100%;object-fit:cover">
+      <div class="video-play-overlay" id="videoPlayBtn" ${playAction}>
+        <svg width="24" height="28" viewBox="0 0 24 28" fill="white"><polygon points="0,0 24,14 0,28"/></svg>
+      </div>
+      ${durationLabel ? `<div class="video-meta-badge">\uD83C\uDFA5 ${durationLabel}</div>` : ''}
+    </div>`;
+  } else if (isVideo && videoSrc) {
+    // Fallback: direct video (no thumbnail)
+    mediaEl.innerHTML = `<div class="modal-video-wrap">
+      <video id="modalVideo" poster="" preload="metadata" playsinline>
         <source src="${videoSrc}" type="video/mp4">
       </video>
       <div class="video-play-overlay" id="videoPlayBtn" onclick="toggleModalVideo()">
@@ -2546,15 +2558,8 @@ function openCreativeModal(adId) {
       </div>
       ${durationLabel ? `<div class="video-meta-badge">\uD83C\uDFA5 ${durationLabel}</div>` : ''}
     </div>`;
-  } else if (isVideo && c.video_id) {
-    // Embedded Facebook video player
-    const embedUrl = `https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=${c.video_id}&show_text=false&width=480`;
-    mediaEl.innerHTML = `<div class="modal-video-wrap" style="background:#000">
-      <iframe src="${embedUrl}" width="100%" height="100%" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>
-      ${durationLabel ? `<div class="video-meta-badge">\uD83C\uDFA5 ${durationLabel}</div>` : ''}
-    </div>`;
   } else if (hdThumb) {
-    mediaEl.innerHTML = `<img src="${hdThumb}" alt="" style="max-width:100%;max-height:80vh;object-fit:contain" onerror="this.src='';this.alt='No image'">`;
+    mediaEl.innerHTML = `<img src="${hdThumb}" alt="" style="width:100%;height:100%;object-fit:cover" onerror="this.src='';this.alt='No image'">`;
   } else {
     mediaEl.innerHTML = '<div style="color:var(--text-muted);font-size:48px">\uD83D\uDCC4</div>';
   }
@@ -2635,6 +2640,24 @@ function toggleModalVideo() {
   } else {
     vid.pause();
   }
+}
+
+function playModalVideo(btnEl, src) {
+  // Swap thumbnail for inline video player
+  const wrap = btnEl.closest('.modal-video-wrap');
+  const thumb = wrap.querySelector('#modalThumb');
+  if (!thumb) return;
+  const video = document.createElement('video');
+  video.id = 'modalVideo';
+  video.style.cssText = 'width:100%;height:100%;object-fit:cover';
+  video.setAttribute('playsinline', '');
+  video.setAttribute('autoplay', '');
+  video.innerHTML = `<source src="${src}" type="video/mp4">`;
+  thumb.replaceWith(video);
+  btnEl.classList.add('hidden');
+  video.addEventListener('pause', () => btnEl.classList.remove('hidden'), { once: true });
+  video.addEventListener('ended', () => { btnEl.classList.remove('hidden'); video.currentTime = 0; }, { once: true });
+  video.addEventListener('click', () => video.pause());
 }
 
 function closeCreativeModal() {
