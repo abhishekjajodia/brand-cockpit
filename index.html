@@ -1019,6 +1019,10 @@
 </div>
 
 <script>
+// Prevent browser scroll restoration
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+
 // ── Config ──
 const SUPABASE_URL = 'https://dyktmiyvpnayqwwlqspe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5a3RtaXl2cG5heXF3d2xxc3BlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1OTUxOTIsImV4cCI6MjA4NzE3MTE5Mn0.2Ij_ZJs_VJPFhy81Vm_bm6J8RCjI3t4rKICAr00IRYs';
@@ -1483,7 +1487,7 @@ function renderDashboard() {
   initAnimations();
   initNavTracking();
   // Ensure page starts at top after load
-  window.scrollTo(0, 0);
+  setTimeout(() => window.scrollTo(0, 0), 100);
 }
 
 // ── Hero ──
