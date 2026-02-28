@@ -2642,6 +2642,9 @@ function closeCreativeModal() {
   document.body.style.overflow = '';
   const vid = document.querySelector('#modalMedia video');
   if (vid) vid.pause();
+  // Kill iframe embeds (FB video keeps playing otherwise)
+  const iframe = document.querySelector('#modalMedia iframe');
+  if (iframe) iframe.src = '';
 }
 
 document.addEventListener('keydown', (e) => {
