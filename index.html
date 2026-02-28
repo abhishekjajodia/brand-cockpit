@@ -553,6 +553,71 @@
   .health-bar-table { display: inline-block; width: 50px; height: 4px; background: var(--border); border-radius: 4px; vertical-align: middle; margin-right: 6px; overflow: hidden; }
   .health-num { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
 
+  /* ── Breakdowns ── */
+  .breakdown-tabs {
+    display: flex; gap: 4px; margin-bottom: 20px;
+    background: var(--bg); border-radius: var(--radius-pill);
+    padding: 4px; width: fit-content; border: 1px solid var(--border);
+  }
+  .breakdown-tab {
+    padding: 8px 18px; border-radius: var(--radius-pill);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    color: var(--text-muted); transition: all 0.2s; border: none; background: none;
+    font-family: inherit;
+  }
+  .breakdown-tab:hover { color: var(--text); background: rgba(138,56,245,0.05); }
+  .breakdown-tab.active { background: var(--accent); color: #fff; font-weight: 600; }
+  .breakdown-panel { display: none; }
+  .breakdown-panel.active { display: block; }
+  .bd-table-wrap {
+    overflow-x: auto; border-radius: var(--radius-lg);
+    border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+    background: var(--bg-card);
+  }
+  .bd-table {
+    width: 100%; border-collapse: collapse; font-size: 13px;
+  }
+  .bd-table th {
+    background: var(--bg-card-hover); padding: 10px 14px;
+    text-align: left; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;
+    white-space: nowrap; position: sticky; top: 0;
+  }
+  .bd-table td {
+    padding: 10px 14px; border-top: 1px solid var(--border);
+    white-space: nowrap; vertical-align: middle;
+  }
+  .bd-table tr:hover td { background: var(--bg-card-hover); }
+  .bd-table .td-name { white-space: normal; max-width: 300px; font-weight: 500; }
+  .bd-table .td-num { font-family: var(--font-mono); font-size: 12px; text-align: right; }
+  .bd-table .td-num-left { font-family: var(--font-mono); font-size: 12px; }
+  .funnel-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 8px;
+    border-radius: var(--radius-pill); letter-spacing: 0.3px;
+  }
+  .funnel-badge.tof { background: rgba(37,99,235,0.1); color: #2563EB; }
+  .funnel-badge.mof { background: rgba(138,56,245,0.1); color: #8A38F5; }
+  .funnel-badge.bof { background: rgba(22,163,74,0.1); color: #16A34A; }
+  .funnel-badge.mof-bof { background: rgba(234,88,12,0.1); color: #EA580C; }
+  .funnel-badge.other { background: rgba(107,114,128,0.1); color: #6B7280; }
+  .bd-expand-row { cursor: pointer; }
+  .bd-expand-row:hover td { background: rgba(138,56,245,0.03); }
+  .bd-expand-icon { font-size: 10px; color: var(--text-dim); margin-right: 6px; transition: transform 0.2s; display: inline-block; }
+  .bd-expand-icon.open { transform: rotate(90deg); }
+  .bd-child-row td { background: rgba(138,56,245,0.02); }
+  .bd-child-row td:first-child { padding-left: 36px; }
+  .bd-child-row.hidden { display: none; }
+  .bd-summary-row td { font-weight: 600; background: var(--bg-card-hover); border-top: 2px solid var(--border); }
+  .bd-share-bar {
+    display: inline-block; width: 60px; height: 6px; background: var(--border);
+    border-radius: 3px; vertical-align: middle; overflow: hidden;
+  }
+  .bd-share-fill { height: 100%; border-radius: 3px; background: var(--accent); }
+  .trend-arrow { font-size: 11px; margin-left: 2px; }
+  .trend-arrow.up { color: var(--green); }
+  .trend-arrow.down { color: var(--red); }
+  .trend-arrow.flat { color: var(--text-dim); }
+
   /* ── Funnel ── */
   .funnel-wrap {
     display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
@@ -817,6 +882,7 @@
     </div>
     <a href="#overview" class="nav-tab" onclick="scrollTo_(event,'overview')">Overview</a>
     <a href="#swimlanes" class="nav-tab" onclick="scrollTo_(event,'swimlanes')">Swim Lanes</a>
+    <a href="#breakdowns" class="nav-tab" onclick="scrollTo_(event,'breakdowns')">Breakdowns</a>
     <a href="#table" class="nav-tab active" onclick="scrollTo_(event,'table')">Table</a>
     <a href="#funnel" class="nav-tab" onclick="scrollTo_(event,'funnel')">Funnel</a>
     <a href="#audience" class="nav-tab" onclick="scrollTo_(event,'audience')">Audience</a>
@@ -899,6 +965,28 @@
 </div>
 </section>
 
+<!-- Breakdowns -->
+<section id="breakdowns" class="section">
+<div class="container">
+  <div class="section-header fade-in">
+    <h2>Campaign & Ad Set Breakdowns</h2>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="breakdown-tabs fade-in">
+    <button class="breakdown-tab active" onclick="switchBreakdown('campaign')">Campaign</button>
+    <button class="breakdown-tab" onclick="switchBreakdown('adset')">Ad Set</button>
+    <button class="breakdown-tab" onclick="switchBreakdown('product')">Product</button>
+    <button class="breakdown-tab" onclick="switchBreakdown('format')">Format</button>
+  </div>
+
+  <div id="bd-campaign" class="breakdown-panel active"></div>
+  <div id="bd-adset" class="breakdown-panel"></div>
+  <div id="bd-product" class="breakdown-panel"></div>
+  <div id="bd-format" class="breakdown-panel"></div>
+</div>
+</section>
+
 <!-- Table -->
 <section id="table" class="section">
 <div class="container">
@@ -968,10 +1056,14 @@
 <section id="funnel" class="section">
 <div class="container">
   <div class="section-header fade-in">
-    <h2>Conversion Funnel (14 days)</h2>
+    <h2>Conversion Funnels</h2>
     <div class="section-line"></div>
   </div>
+  <div class="breakdown-tabs fade-in" id="funnelTabs">
+    <button class="breakdown-tab active" onclick="switchFunnelTab(this,'all')">All Products</button>
+  </div>
   <div class="funnel-wrap fade-in" id="funnelWrap"></div>
+  <div id="productFunnelWrap" class="fade-in" style="margin-top:32px"></div>
 </div>
 </section>
 
@@ -1405,17 +1497,26 @@ async function loadDashboard() {
     breakdownParams.p_days = dpDays || 30;
   }
 
-  const [dailyRes, creativesRes, ad7dRes, breakdownRes] = await Promise.all([
+  const wsId = currentWorkspace.workspace_id;
+  const acctId = currentWorkspace.meta_ad_account;
+
+  const [dailyRes, creativesRes, ad7dRes, breakdownRes, campaignRes, adsetRes, productFunnelRes] = await Promise.all([
     sb.rpc('dashboard_daily', dailyParams),
-    sb.rpc('dashboard_creatives', { p_workspace_id: currentWorkspace.workspace_id }),
-    sb.rpc('dashboard_ad_7d', { p_account_id: currentWorkspace.meta_ad_account, p_limit: 200 }),
-    sb.rpc('dashboard_breakdown', breakdownParams)
+    sb.rpc('dashboard_creatives', { p_workspace_id: wsId }),
+    sb.rpc('dashboard_ad_7d', { p_account_id: acctId, p_limit: 200 }),
+    sb.rpc('dashboard_breakdown', breakdownParams),
+    sb.rpc('dashboard_campaign_breakdown', { p_workspace_id: wsId, p_account_id: acctId }),
+    sb.rpc('dashboard_adset_breakdown', { p_workspace_id: wsId, p_account_id: acctId }),
+    sb.rpc('dashboard_product_funnel', { p_workspace_id: wsId, p_days: dpDays || 30 })
   ]);
 
   if (dailyRes.error) { console.error('daily error:', dailyRes.error); }
   if (creativesRes.error) { console.error('creatives error:', creativesRes.error); }
   if (ad7dRes.error) { console.error('ad7d error:', ad7dRes.error); }
   if (breakdownRes.error) { console.error('breakdown error:', breakdownRes.error); }
+  if (campaignRes.error) { console.error('campaign error:', campaignRes.error); }
+  if (adsetRes.error) { console.error('adset error:', adsetRes.error); }
+  if (productFunnelRes.error) { console.error('product funnel error:', productFunnelRes.error); }
 
   const ad7d = {};
   (ad7dRes.data || []).forEach(r => { ad7d[r.ad_id] = r; });
@@ -1429,6 +1530,9 @@ async function loadDashboard() {
     daily: dailyRes.data || [],
     creatives,
     breakdown: breakdownRes.data || [],
+    campaigns: campaignRes.data || [],
+    adsets: adsetRes.data || [],
+    productFunnels: productFunnelRes.data || [],
     actionColors: { SCALE: '#3b82f6', MAINTAIN: '#22c55e', WATCH: '#eab308', KILL: '#ef4444', TEST: '#a855f7', MONITOR: '#6B7280' },
     phaseColors: { scaling: '#8A38F5', peak: '#22c55e', learning: '#3b82f6', declining: '#eab308', fatigued: '#ef4444', paused: '#6B7280' }
   };
@@ -1477,6 +1581,7 @@ function renderDashboard() {
   renderKPIs();
   renderPhaseBar();
   renderSwimLanes();
+  renderBreakdowns();
   renderTable();
   renderFunnel();
   renderAudienceSegments();
@@ -1647,6 +1752,261 @@ function renderSwimLanes() {
   }).join('');
 }
 
+// ── Breakdowns ──
+function switchBreakdown(tab) {
+  document.querySelectorAll('.breakdown-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.breakdown-panel').forEach(p => p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('bd-' + tab).classList.add('active');
+}
+
+function trendArrow(trend) {
+  if (trend === 'up') return '<span class="trend-arrow up">&#9650;</span>';
+  if (trend === 'down') return '<span class="trend-arrow down">&#9660;</span>';
+  return '<span class="trend-arrow flat">&#8212;</span>';
+}
+
+function funnelBadge(stage) {
+  const cls = (stage || 'other').toLowerCase().replace('+', '-').replace(' ', '');
+  const map = { 'tof': 'tof', 'mof': 'mof', 'bof': 'bof', 'mof+bof': 'mof-bof', 'mofbof': 'mof-bof', 'awareness': 'other' };
+  return `<span class="funnel-badge ${map[cls] || 'other'}">${stage}</span>`;
+}
+
+function shareBar(value, max) {
+  const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
+  return `<div class="bd-share-bar"><div class="bd-share-fill" style="width:${pct}%"></div></div>`;
+}
+
+function renderBreakdowns() {
+  renderCampaignBreakdown();
+  renderAdsetBreakdown();
+  renderProductBreakdown();
+  renderFormatBreakdown();
+}
+
+function renderCampaignBreakdown() {
+  const campaigns = DATA.campaigns || [];
+  if (!campaigns.length) {
+    document.getElementById('bd-campaign').innerHTML = '<p style="color:var(--text-muted);padding:20px">No campaign data available</p>';
+    return;
+  }
+  const totalSpend = campaigns.reduce((s, c) => s + Number(c.lifetime_spend), 0);
+  const maxSpend = Math.max(...campaigns.map(c => Number(c.lifetime_spend)));
+  const currency = currentWorkspace.currency === 'INR' ? '\u20B9' : '$';
+
+  // Group by funnel stage for summary row
+  const rows = campaigns.map(c => {
+    const spend = Number(c.lifetime_spend);
+    const rev = Number(c.lifetime_revenue);
+    const roas = Number(c.lifetime_roas);
+    const s7d = Number(c.spend_7d);
+    const r7d = Number(c.roas_7d);
+    const pct = totalSpend > 0 ? ((spend / totalSpend) * 100).toFixed(1) : '0';
+    const adsets = DATA.adsets.filter(a => a.campaign_id === c.campaign_id);
+    const hasAdsets = adsets.length > 0;
+    return `<tr class="${hasAdsets ? 'bd-expand-row' : ''}" ${hasAdsets ? `onclick="toggleAdsets('${c.campaign_id}')"` : ''}>
+      <td class="td-name">${hasAdsets ? '<span class="bd-expand-icon" id="expand-' + c.campaign_id + '">&#9654;</span>' : '<span style="width:16px;display:inline-block"></span>'}${c.campaign_name}</td>
+      <td>${funnelBadge(c.funnel_stage)}</td>
+      <td><span class="funnel-badge other">${c.product_focus}</span></td>
+      <td class="td-num">${c.ad_count} <span style="color:var(--text-dim);font-size:10px">(${c.active_ads} live)</span></td>
+      <td class="td-num">${c.adset_count}</td>
+      <td class="td-num">${fmtCurrency(spend)} ${shareBar(spend, maxSpend)}</td>
+      <td class="td-num">${pct}%</td>
+      <td class="td-num">${fmtCurrency(rev)}</td>
+      <td class="td-num" style="color:${roas >= 2 ? 'var(--green)' : roas >= 1 ? 'var(--yellow)' : 'var(--red)'}">${roas.toFixed(2)}x</td>
+      <td class="td-num">${fmtCurrency(s7d)}</td>
+      <td class="td-num" style="color:${r7d >= 2 ? 'var(--green)' : r7d >= 1 ? 'var(--yellow)' : 'var(--red)'}">${r7d.toFixed(2)}x ${trendArrow(c.roas_trend)}</td>
+    </tr>` + (hasAdsets ? adsets.map(a => {
+      const as7d = Number(a.spend_7d);
+      const ar7d = Number(a.roas_7d);
+      return `<tr class="bd-child-row hidden" data-campaign="${c.campaign_id}">
+        <td class="td-name" style="font-weight:400;font-size:12px">${a.adset_name}</td>
+        <td></td>
+        <td><span style="font-size:10px;color:var(--text-dim)">${a.formats || ''}</span></td>
+        <td class="td-num">${a.ad_count} <span style="color:var(--text-dim);font-size:10px">(${a.active_ads} live)</span></td>
+        <td class="td-num"></td>
+        <td class="td-num">${fmtCurrency(Number(a.lifetime_spend))}</td>
+        <td class="td-num">${totalSpend > 0 ? ((Number(a.lifetime_spend) / totalSpend) * 100).toFixed(1) : '0'}%</td>
+        <td class="td-num">${fmtCurrency(Number(a.lifetime_revenue))}</td>
+        <td class="td-num" style="color:${Number(a.lifetime_roas) >= 2 ? 'var(--green)' : Number(a.lifetime_roas) >= 1 ? 'var(--yellow)' : 'var(--red)'}">${Number(a.lifetime_roas).toFixed(2)}x</td>
+        <td class="td-num">${fmtCurrency(as7d)}</td>
+        <td class="td-num" style="color:${ar7d >= 2 ? 'var(--green)' : ar7d >= 1 ? 'var(--yellow)' : 'var(--red)'}">${ar7d.toFixed(2)}x ${trendArrow(a.roas_trend)}</td>
+      </tr>`;
+    }).join('') : '');
+  }).join('');
+
+  // Summary row
+  const totalRev = campaigns.reduce((s, c) => s + Number(c.lifetime_revenue), 0);
+  const totalRoas = totalSpend > 0 ? (totalRev / totalSpend) : 0;
+  const total7d = campaigns.reduce((s, c) => s + Number(c.spend_7d), 0);
+  const totalRev7d = campaigns.reduce((s, c) => s + Number(c.revenue_7d), 0);
+  const totalRoas7d = total7d > 0 ? (totalRev7d / total7d) : 0;
+  const totalAds = campaigns.reduce((s, c) => s + Number(c.ad_count), 0);
+
+  document.getElementById('bd-campaign').innerHTML = `<div class="bd-table-wrap fade-in">
+    <table class="bd-table">
+      <thead><tr>
+        <th>Campaign</th><th>Funnel</th><th>Product</th><th>Ads</th><th>Ad Sets</th>
+        <th>Lifetime Spend</th><th>Share</th><th>Revenue</th><th>ROAS</th>
+        <th>7d Spend</th><th>7d ROAS</th>
+      </tr></thead>
+      <tbody>
+        ${rows}
+        <tr class="bd-summary-row">
+          <td>Total (${campaigns.length} campaigns)</td><td></td><td></td>
+          <td class="td-num">${totalAds}</td><td></td>
+          <td class="td-num">${fmtCurrency(totalSpend)}</td><td class="td-num">100%</td>
+          <td class="td-num">${fmtCurrency(totalRev)}</td>
+          <td class="td-num">${totalRoas.toFixed(2)}x</td>
+          <td class="td-num">${fmtCurrency(total7d)}</td>
+          <td class="td-num">${totalRoas7d.toFixed(2)}x</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>`;
+}
+
+function toggleAdsets(campaignId) {
+  const icon = document.getElementById('expand-' + campaignId);
+  const rows = document.querySelectorAll(`tr[data-campaign="${campaignId}"]`);
+  const isOpen = icon && icon.classList.contains('open');
+  if (icon) icon.classList.toggle('open');
+  rows.forEach(r => r.classList.toggle('hidden'));
+}
+
+function renderAdsetBreakdown() {
+  const adsets = DATA.adsets || [];
+  if (!adsets.length) {
+    document.getElementById('bd-adset').innerHTML = '<p style="color:var(--text-muted);padding:20px">No ad set data available</p>';
+    return;
+  }
+  const totalSpend = adsets.reduce((s, a) => s + Number(a.lifetime_spend), 0);
+  const maxSpend = Math.max(...adsets.map(a => Number(a.lifetime_spend)));
+
+  const rows = adsets.map(a => {
+    const spend = Number(a.lifetime_spend);
+    const roas = Number(a.lifetime_roas);
+    const s7d = Number(a.spend_7d);
+    const r7d = Number(a.roas_7d);
+    const pct = totalSpend > 0 ? ((spend / totalSpend) * 100).toFixed(1) : '0';
+    return `<tr>
+      <td class="td-name">${a.adset_name}</td>
+      <td style="font-size:12px;color:var(--text-muted)">${a.campaign_name || ''}</td>
+      <td>${funnelBadge(a.funnel_stage)}</td>
+      <td><span style="font-size:11px;color:var(--text-dim)">${a.formats || ''}</span></td>
+      <td class="td-num">${a.ad_count} <span style="color:var(--text-dim);font-size:10px">(${a.active_ads} live)</span></td>
+      <td class="td-num">${fmtCurrency(spend)} ${shareBar(spend, maxSpend)}</td>
+      <td class="td-num">${pct}%</td>
+      <td class="td-num">${fmtCurrency(Number(a.lifetime_revenue))}</td>
+      <td class="td-num" style="color:${roas >= 2 ? 'var(--green)' : roas >= 1 ? 'var(--yellow)' : 'var(--red)'}">${roas.toFixed(2)}x</td>
+      <td class="td-num">${fmtCurrency(s7d)} ${trendArrow(a.spend_trend)}</td>
+      <td class="td-num" style="color:${r7d >= 2 ? 'var(--green)' : r7d >= 1 ? 'var(--yellow)' : 'var(--red)'}">${r7d.toFixed(2)}x ${trendArrow(a.roas_trend)}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('bd-adset').innerHTML = `<div class="bd-table-wrap fade-in">
+    <table class="bd-table">
+      <thead><tr>
+        <th>Ad Set</th><th>Campaign</th><th>Funnel</th><th>Formats</th><th>Ads</th>
+        <th>Lifetime Spend</th><th>Share</th><th>Revenue</th><th>ROAS</th>
+        <th>7d Spend</th><th>7d ROAS</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+function renderProductBreakdown() {
+  const creatives = DATA.creatives || [];
+  const groups = {};
+  creatives.forEach(c => {
+    const p = c.product || 'Other';
+    if (!groups[p]) groups[p] = { ads: [], spend: 0, rev: 0, s7d: 0, r7d: 0, impressions: 0, clicks: 0, conversions: 0 };
+    groups[p].ads.push(c);
+    groups[p].spend += Number(c.lifetime_spend) || 0;
+    groups[p].rev += Number(c.lifetime_value) || 0;
+    groups[p].s7d += Number(c.spend_7d) || 0;
+    groups[p].r7d += Number(c.current_7d_spend) || 0;
+    groups[p].impressions += Number(c.lifetime_impressions) || 0;
+    groups[p].clicks += Number(c.lifetime_clicks) || 0;
+    groups[p].conversions += Number(c.lifetime_conversions) || 0;
+  });
+  const totalSpend = Object.values(groups).reduce((s, g) => s + g.spend, 0);
+  const maxSpend = Math.max(...Object.values(groups).map(g => g.spend));
+  const rows = Object.entries(groups).sort((a, b) => b[1].spend - a[1].spend).map(([name, g]) => {
+    const roas = g.spend > 0 ? (g.rev / g.spend) : 0;
+    const ctr = g.impressions > 0 ? (g.clicks / g.impressions * 100) : 0;
+    const pct = totalSpend > 0 ? ((g.spend / totalSpend) * 100).toFixed(1) : '0';
+    const active = g.ads.filter(a => ['scaling','testing','rising'].includes((a.lifecycle_phase||'').toLowerCase())).length;
+    return `<tr>
+      <td class="td-name" style="font-weight:600">${name}</td>
+      <td class="td-num">${g.ads.length} <span style="color:var(--text-dim);font-size:10px">(${active} live)</span></td>
+      <td class="td-num">${fmtCurrency(g.spend)} ${shareBar(g.spend, maxSpend)}</td>
+      <td class="td-num">${pct}%</td>
+      <td class="td-num">${fmtCurrency(g.rev)}</td>
+      <td class="td-num" style="color:${roas >= 2 ? 'var(--green)' : roas >= 1 ? 'var(--yellow)' : 'var(--red)'}">${roas.toFixed(2)}x</td>
+      <td class="td-num">${fmtNum(g.impressions)}</td>
+      <td class="td-num">${fmtNum(g.clicks)}</td>
+      <td class="td-num">${ctr.toFixed(2)}%</td>
+      <td class="td-num">${Math.round(g.conversions)}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('bd-product').innerHTML = `<div class="bd-table-wrap fade-in">
+    <table class="bd-table">
+      <thead><tr>
+        <th>Product</th><th>Ads</th><th>Lifetime Spend</th><th>Share</th>
+        <th>Revenue</th><th>ROAS</th><th>Impressions</th><th>Clicks</th><th>CTR</th><th>Conversions</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
+function renderFormatBreakdown() {
+  const creatives = DATA.creatives || [];
+  const groups = {};
+  creatives.forEach(c => {
+    const f = (c.format || 'unknown').toLowerCase();
+    const label = f.charAt(0).toUpperCase() + f.slice(1);
+    if (!groups[label]) groups[label] = { ads: [], spend: 0, rev: 0, impressions: 0, clicks: 0, conversions: 0 };
+    groups[label].ads.push(c);
+    groups[label].spend += Number(c.lifetime_spend) || 0;
+    groups[label].rev += Number(c.lifetime_value) || 0;
+    groups[label].impressions += Number(c.lifetime_impressions) || 0;
+    groups[label].clicks += Number(c.lifetime_clicks) || 0;
+    groups[label].conversions += Number(c.lifetime_conversions) || 0;
+  });
+  const totalSpend = Object.values(groups).reduce((s, g) => s + g.spend, 0);
+  const maxSpend = Math.max(...Object.values(groups).map(g => g.spend));
+  const fmtIcons = { 'Video': '\uD83C\uDFA5', 'Image': '\uD83D\uDDBC\uFE0F', 'Carousel': '\uD83D\uDDC3\uFE0F', 'Story': '\uD83D\uDCF1' };
+  const rows = Object.entries(groups).sort((a, b) => b[1].spend - a[1].spend).map(([name, g]) => {
+    const roas = g.spend > 0 ? (g.rev / g.spend) : 0;
+    const ctr = g.impressions > 0 ? (g.clicks / g.impressions * 100) : 0;
+    const pct = totalSpend > 0 ? ((g.spend / totalSpend) * 100).toFixed(1) : '0';
+    return `<tr>
+      <td class="td-name" style="font-weight:600">${fmtIcons[name] || '\uD83D\uDCC4'} ${name}</td>
+      <td class="td-num">${g.ads.length}</td>
+      <td class="td-num">${fmtCurrency(g.spend)} ${shareBar(g.spend, maxSpend)}</td>
+      <td class="td-num">${pct}%</td>
+      <td class="td-num">${fmtCurrency(g.rev)}</td>
+      <td class="td-num" style="color:${roas >= 2 ? 'var(--green)' : roas >= 1 ? 'var(--yellow)' : 'var(--red)'}">${roas.toFixed(2)}x</td>
+      <td class="td-num">${fmtNum(g.impressions)}</td>
+      <td class="td-num">${fmtNum(g.clicks)}</td>
+      <td class="td-num">${ctr.toFixed(2)}%</td>
+      <td class="td-num">${Math.round(g.conversions)}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('bd-format').innerHTML = `<div class="bd-table-wrap fade-in">
+    <table class="bd-table">
+      <thead><tr>
+        <th>Format</th><th>Ads</th><th>Lifetime Spend</th><th>Share</th>
+        <th>Revenue</th><th>ROAS</th><th>Impressions</th><th>Clicks</th><th>CTR</th><th>Conversions</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
+
 // ── Table ──
 function renderTable() {
   const tbody = document.getElementById('tableBody');
@@ -1667,7 +2027,7 @@ function renderTable() {
     const pc = DATA.phaseColors[phase] || '#6B7280';
     const prc = product === 'varapace' ? '#8A38F5' : product === 'varaspan' ? '#06b6d4' : product === 'varacare' ? '#22c55e' : '#6B7280';
     const trendIcon = c.roas_trend === 'up' ? '\u2191' : c.roas_trend === 'down' ? '\u2193' : '\u2192';
-    const trendColor = c.roas_trend === 'up' ? '#22c55e' : c.roas_trend === 'down' ? '#ef4444' : '#e4e4e7';
+    const trendColor = c.roas_trend === 'up' ? '#22c55e' : c.roas_trend === 'down' ? '#ef4444' : '#9CA3AF';
     const healthColor = c.health >= 70 ? '#22c55e' : c.health >= 40 ? '#eab308' : '#ef4444';
     const ltSpend = Number(c.lifetime_spend) || 0;
     const ltRoas = Number(c.lifetime_roas) || 0;
@@ -1753,6 +2113,118 @@ function renderFunnel() {
       ${worstLeak ? `<div class="worst-leak"><strong>Biggest leak:</strong> ${worstLeak.from} \u2192 ${worstLeak.to} (${worstLeak.drop}% drop)</div>` : ''}
     </div>
   `;
+
+  // Product funnel tabs
+  renderProductFunnels();
+}
+
+function switchFunnelTab(btn, product) {
+  document.querySelectorAll('#funnelTabs .breakdown-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  if (product === 'all') {
+    document.getElementById('funnelWrap').style.display = '';
+    document.getElementById('productFunnelWrap').style.display = 'none';
+  } else {
+    document.getElementById('funnelWrap').style.display = 'none';
+    document.getElementById('productFunnelWrap').style.display = '';
+    renderSingleProductFunnel(product);
+  }
+}
+
+function renderProductFunnels() {
+  const products = (DATA.productFunnels || []).filter(p => Number(p.total_spend) > 100);
+  if (!products.length) return;
+
+  // Add product tabs
+  const tabsEl = document.getElementById('funnelTabs');
+  products.forEach(p => {
+    const btn = document.createElement('button');
+    btn.className = 'breakdown-tab';
+    btn.textContent = p.product;
+    btn.onclick = function() { switchFunnelTab(this, p.product); };
+    tabsEl.appendChild(btn);
+  });
+
+  // Also render side-by-side comparison
+  document.getElementById('productFunnelWrap').style.display = 'none';
+}
+
+function renderSingleProductFunnel(productName) {
+  const p = (DATA.productFunnels || []).find(f => f.product === productName);
+  if (!p) return;
+
+  const steps = [
+    { label: 'Impressions', val: Number(p.total_impressions) },
+    { label: 'Clicks', val: Number(p.total_clicks) },
+    { label: 'Link Clicks', val: Number(p.link_clicks) },
+    { label: 'Landing Page Views', val: Number(p.landing_page_views) },
+    { label: 'Content Views', val: Number(p.content_views) },
+    { label: 'Add to Cart', val: Number(p.adds_to_cart) },
+    { label: 'Checkout', val: Number(p.checkouts_initiated) },
+    { label: 'Purchases', val: Number(p.purchases) }
+  ];
+  const maxVal = steps[0].val || 1;
+
+  const stepsHtml = steps.map((s, i) => {
+    const pct = ((s.val / maxVal) * 100).toFixed(0);
+    const convRate = i > 0 && steps[i - 1].val > 0 ? ((s.val / steps[i - 1].val) * 100).toFixed(1) : '';
+    return `<div class="funnel-step">
+      <div class="funnel-info">
+        <span class="funnel-label">${s.label}</span>
+        <span class="funnel-val">${fmtNum(s.val)}</span>
+        ${convRate ? `<span class="funnel-conv">${convRate}%</span>` : ''}
+      </div>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+
+  // Key metrics
+  const spend = Number(p.total_spend);
+  const rev = Number(p.purchase_value);
+  const roas = Number(p.roas);
+  const cpc = Number(p.cpc);
+  const cpp = Number(p.cpp);
+  const adCount = Number(p.ad_count);
+
+  // Leak rates
+  const leaks = [];
+  for (let i = 1; i < steps.length; i++) {
+    if (steps[i - 1].val > 0) {
+      const drop = ((1 - steps[i].val / steps[i - 1].val) * 100).toFixed(1);
+      leaks.push({ from: steps[i - 1].label, to: steps[i].label, drop });
+    }
+  }
+  const worstLeak = leaks.length ? leaks.reduce((w, l) => Number(l.drop) > Number(w.drop) ? l : w, leaks[0]) : null;
+
+  const leakHtml = leaks.map(l => `
+    <div class="leak-item">
+      <span>${l.from} \u2192 ${l.to}</span>
+      <span class="leak-rate" style="color:${Number(l.drop) > 50 ? '#ef4444' : Number(l.drop) > 20 ? '#eab308' : '#22c55e'}">${l.drop}% drop</span>
+    </div>
+  `).join('');
+
+  document.getElementById('productFunnelWrap').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+      <div class="funnel-steps">${stepsHtml}</div>
+      <div>
+        <div class="funnel-health" style="margin-bottom:16px">
+          <h3>${productName} Summary</h3>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0">
+            <div><span class="boco-label" style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim)">Spend</span><br><span style="font-family:var(--font-mono);font-size:18px;font-weight:600">${fmtCurrency(spend)}</span></div>
+            <div><span class="boco-label" style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim)">Revenue</span><br><span style="font-family:var(--font-mono);font-size:18px;font-weight:600">${fmtCurrency(rev)}</span></div>
+            <div><span class="boco-label" style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim)">ROAS</span><br><span style="font-family:var(--font-mono);font-size:18px;font-weight:600;color:${roas >= 2 ? 'var(--green)' : roas >= 1 ? 'var(--yellow)' : 'var(--red)'}">${roas.toFixed(2)}x</span></div>
+            <div><span class="boco-label" style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim)">Cost/Purchase</span><br><span style="font-family:var(--font-mono);font-size:18px;font-weight:600">${fmtCurrency(cpp)}</span></div>
+            <div><span class="boco-label" style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim)">CPC</span><br><span style="font-family:var(--font-mono);font-size:18px;font-weight:600">${fmtCurrency(cpc)}</span></div>
+            <div><span class="boco-label" style="font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-dim)">Active Ads</span><br><span style="font-family:var(--font-mono);font-size:18px;font-weight:600">${adCount}</span></div>
+          </div>
+        </div>
+        <div class="funnel-health">
+          <h3>Funnel Leaks</h3>
+          ${leakHtml}
+          ${worstLeak ? `<div class="worst-leak" style="margin-top:12px"><strong>Biggest leak:</strong> ${worstLeak.from} \u2192 ${worstLeak.to} (${worstLeak.drop}% drop)</div>` : ''}
+        </div>
+      </div>
+    </div>`;
 }
 
 // ── Audience Segments ──
@@ -2053,7 +2525,7 @@ function openCreativeModal(adId) {
   const durationLabel = c.video_duration ? Number(c.video_duration).toFixed(0) + 's' : '';
 
   if (isVideo && videoSrc) {
-    // Direct video playback
+    // Direct video playback (when source URL available)
     mediaEl.innerHTML = `<div class="modal-video-wrap">
       <video id="modalVideo" poster="${hdThumb || ''}" preload="metadata" playsinline>
         <source src="${videoSrc}" type="video/mp4">
@@ -2063,15 +2535,12 @@ function openCreativeModal(adId) {
       </div>
       ${durationLabel ? `<div class="video-meta-badge">\uD83C\uDFA5 ${durationLabel}</div>` : ''}
     </div>`;
-  } else if (isVideo && hdThumb) {
-    // Video without source URL — show thumbnail + link to FB
-    mediaEl.innerHTML = `<div class="modal-video-wrap">
-      <img src="${hdThumb}" alt="" style="max-width:100%;max-height:80vh;object-fit:contain" onerror="this.src='';this.alt='No image'">
-      <a href="${fbVideoUrl}" target="_blank" class="video-play-overlay" title="Watch on Facebook">
-        <svg width="24" height="28" viewBox="0 0 24 28" fill="white"><polygon points="0,0 24,14 0,28"/></svg>
-      </a>
+  } else if (isVideo && c.video_id) {
+    // Embedded Facebook video player
+    const embedUrl = `https://www.facebook.com/plugins/video.php?href=https://www.facebook.com/watch/?v=${c.video_id}&show_text=false&width=480`;
+    mediaEl.innerHTML = `<div class="modal-video-wrap" style="background:#000">
+      <iframe src="${embedUrl}" width="100%" height="100%" style="border:none;overflow:hidden;min-height:400px" scrolling="no" frameborder="0" allowTransparency="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowFullScreen="true"></iframe>
       ${durationLabel ? `<div class="video-meta-badge">\uD83C\uDFA5 ${durationLabel}</div>` : ''}
-      <a href="${fbVideoUrl}" target="_blank" class="video-fb-link">Watch on Facebook \u2197</a>
     </div>`;
   } else if (hdThumb) {
     mediaEl.innerHTML = `<img src="${hdThumb}" alt="" style="max-width:100%;max-height:80vh;object-fit:contain" onerror="this.src='';this.alt='No image'">`;
