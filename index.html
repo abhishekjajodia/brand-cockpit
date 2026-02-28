@@ -2538,10 +2538,9 @@ function openCreativeModal(adId) {
 
   if (isVideo && hdThumb) {
     // Show vertical thumbnail (prefer 9:16 reels thumb) with play overlay
-    const reelsVid = c.reels_video_id || '';
     const playAction = videoSrc
       ? `onclick="playModalVideo(this, '${videoSrc.replace(/'/g, "\\'")}')"`
-      : (c.video_id ? `onclick="playModalEmbed(this, '${c.video_id}', '${reelsVid}')"` : '');
+      : (c.video_id ? `onclick="playModalEmbed(this, '${c.video_id}')"` : '');
     mediaEl.innerHTML = `<div class="modal-video-wrap">
       <img id="modalThumb" src="${hdThumb}" alt="" style="width:100%;height:100%;object-fit:cover">
       <div class="video-play-overlay" id="videoPlayBtn" ${playAction}>
@@ -2662,13 +2661,12 @@ function playModalVideo(btnEl, src) {
   video.addEventListener('click', () => video.pause());
 }
 
-function playModalEmbed(btnEl, videoId, reelsVideoId) {
-  // Swap thumbnail for FB embed iframe — prefer reels (9:16) embed URL
+function playModalEmbed(btnEl, videoId) {
+  // Swap thumbnail for FB embed iframe (always uses original video_id — reels IDs aren't embeddable)
   const wrap = btnEl.closest('.modal-video-wrap');
   const thumb = wrap.querySelector('#modalThumb');
   if (!thumb) return;
-  const targetId = reelsVideoId || videoId;
-  const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(`https://www.facebook.com/watch/?v=${targetId}`)}&show_text=false&autoplay=true&width=480`;
+  const embedUrl = `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(`https://www.facebook.com/watch/?v=${videoId}`)}&show_text=false&autoplay=true&width=480`;
   const iframe = document.createElement('iframe');
   iframe.src = embedUrl;
   iframe.style.cssText = 'width:100%;height:100%;border:none;overflow:hidden';
