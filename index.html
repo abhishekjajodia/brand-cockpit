@@ -441,31 +441,45 @@
 
   /* ── Creative Cards ── */
   .creative-card {
-    flex: 0 0 280px; scroll-snap-align: start;
+    flex: 0 0 340px; scroll-snap-align: start;
     background: var(--bg-card); border: 1px solid var(--border);
     border-radius: var(--radius-lg); overflow: hidden;
-    transition: all 0.2s; cursor: pointer; display: block;
+    transition: all 0.2s; cursor: pointer;
     box-shadow: var(--shadow-sm);
+    display: flex; flex-direction: row;
+    height: 260px;
   }
   .creative-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-md); }
-  .card-thumb { width: 280px; height: 160px; background: #F5F5F5; overflow: hidden; }
-  .card-thumb img { image-rendering: auto; }
-  .card-body { padding: 14px; }
+  .card-thumb {
+    width: 150px; min-width: 150px; height: 100%;
+    background: #F5F5F5; overflow: hidden;
+    position: relative; flex-shrink: 0;
+  }
+  .card-thumb img { width: 100%; height: 100%; object-fit: cover; image-rendering: auto; }
+  .card-thumb .video-badge {
+    position: absolute; bottom: 8px; left: 8px;
+    background: rgba(0,0,0,0.7); color: #fff;
+    padding: 2px 8px; border-radius: var(--radius-pill);
+    font-size: 10px; font-weight: 600;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .card-body { padding: 14px; flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
   .card-badges { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
   .badge {
     font-size: 10px; font-weight: 600; padding: 2px 8px;
     border-radius: var(--radius-pill); text-transform: uppercase; letter-spacing: 0.5px;
   }
   .card-name {
-    font-size: 12px; font-weight: 500; color: var(--text);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    margin-bottom: 10px;
+    font-size: 12px; font-weight: 600; color: var(--text);
+    overflow: hidden; text-overflow: ellipsis;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    margin-bottom: 8px; line-height: 1.4;
   }
   .card-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 10px; }
   .cm { display: flex; flex-direction: column; }
   .cm-label { font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; }
   .cm-val { font-family: var(--font-mono); font-size: 13px; font-weight: 600; }
-  .card-footer { display: flex; align-items: center; gap: 8px; }
+  .card-footer { display: flex; align-items: center; gap: 8px; margin-top: auto; }
   .health-bar-mini { flex: 1; height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
   .health-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
   .action-badge {
@@ -507,18 +521,26 @@
   .data-table th .sort-icon { margin-left: 4px; opacity: 0.3; }
   .data-table th.sorted .sort-icon { opacity: 1; }
   .data-table td {
-    padding: 10px 14px; border-top: 1px solid var(--border);
+    padding: 8px 12px; border-top: 1px solid var(--border);
     white-space: nowrap; vertical-align: middle;
   }
   .data-table tr:hover td { background: var(--bg-card-hover); }
   .data-table tr { transition: background 0.15s; }
-  .td-creative { min-width: 280px; white-space: normal; }
+  .td-creative { min-width: 300px; white-space: normal; }
   .creative-cell { display: flex; align-items: center; gap: 10px; }
   .creative-cell img { flex-shrink: 0; }
+  .table-thumb {
+    width: 48px; height: 72px; border-radius: 6px; object-fit: cover;
+    flex-shrink: 0; background: var(--border);
+  }
   .creative-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .data-table .table-name { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 300px; display: block; }
-  .table-sub { font-size: 11px; color: var(--text-muted); }
-  .thumb-placeholder { width: 44px; height: 44px; border-radius: 6px; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+  .data-table .table-name {
+    font-weight: 500; overflow: hidden; text-overflow: ellipsis;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    white-space: normal; max-width: 280px; line-height: 1.35; font-size: 12px;
+  }
+  .table-sub { font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+  .thumb-placeholder { width: 48px; height: 72px; border-radius: 6px; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
   .td-num { font-family: var(--font-mono), monospace; font-size: 12px; }
   .badge-sm {
     font-size: 10px; font-weight: 600; padding: 2px 7px;
@@ -675,8 +697,8 @@
   @media (max-width: 768px) {
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
     .funnel-wrap { grid-template-columns: 1fr; }
-    .creative-card { flex: 0 0 260px; }
-    .card-thumb { width: 260px; height: 140px; }
+    .creative-card { flex: 0 0 280px; flex-direction: column; height: auto; }
+    .card-thumb { width: 100%; min-width: unset; height: 180px; }
   }
 
   /* ── Animations ── */
@@ -705,6 +727,28 @@
   }
   .modal-media img { max-width: 100%; max-height: 80vh; object-fit: contain; }
   .modal-media video { max-width: 100%; max-height: 80vh; object-fit: contain; border-radius: 8px; }
+  .modal-video-wrap { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+  .modal-video-wrap video { width: 100%; height: 100%; object-fit: contain; }
+  .video-play-overlay {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    width: 64px; height: 64px; background: rgba(138,56,245,0.9); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    transition: all 0.2s; z-index: 2;
+  }
+  .video-play-overlay:hover { background: rgba(138,56,245,1); transform: translate(-50%, -50%) scale(1.1); }
+  .video-play-overlay svg { margin-left: 4px; }
+  .video-play-overlay.hidden { display: none; }
+  .video-meta-badge {
+    position: absolute; bottom: 12px; left: 12px; background: rgba(0,0,0,0.7); color: #fff;
+    padding: 4px 12px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px; z-index: 2;
+  }
+  .video-fb-link {
+    position: absolute; bottom: 12px; right: 12px; background: rgba(138,56,245,0.9); color: #fff;
+    padding: 6px 12px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 600;
+    text-decoration: none; z-index: 2; transition: background 0.2s;
+  }
+  .video-fb-link:hover { background: rgba(138,56,245,1); }
   .modal-details { padding: 28px; overflow-y: auto; max-height: 90vh; }
   .modal-close {
     position: absolute; top: 12px; right: 12px; width: 36px; height: 36px;
@@ -725,7 +769,7 @@
   .modal-adcopy { font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-wrap; max-height: 200px; overflow-y: auto; background: var(--bg); border-radius: 8px; padding: 12px; }
   .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
   .modal-btn {
-    padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    padding: 8px 16px; border-radius: var(--radius-pill); font-size: 12px; font-weight: 600;
     cursor: pointer; border: 1px solid var(--border); background: var(--bg);
     color: var(--text); text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
   }
@@ -1438,6 +1482,8 @@ function renderDashboard() {
   dailyChart();
   initAnimations();
   initNavTracking();
+  // Ensure page starts at top after load
+  window.scrollTo(0, 0);
 }
 
 // ── Hero ──
@@ -1552,11 +1598,14 @@ function renderSwimLanes() {
       const prc = c.product === 'Varapace' ? '#8A38F5' : c.product === 'Varaspan' ? '#06b6d4' : c.product === 'VaraCare' ? '#22c55e' : '#6B7280';
       const trendIcon = c.roas_trend === 'up' ? '\u2191' : c.roas_trend === 'down' ? '\u2193' : '\u2192';
       const trendColor = c.roas_trend === 'up' ? '#22c55e' : c.roas_trend === 'down' ? '#ef4444' : '#6B7280';
-      const thumbImg = c.thumb ? `<img src="${c.thumb}" width="280" height="160" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none'">` : '';
+      const thumbSrc = c.hd_thumbnail_url || c.image_url || c.thumb;
+      const thumbImg = thumbSrc ? `<img src="${thumbSrc}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none'">` : '';
+      const isVideo = !!c.video_id;
+      const videoBadge = isVideo ? `<div class="video-badge"><svg width="8" height="10" viewBox="0 0 8 10" fill="white"><polygon points="0,0 8,5 0,10"/></svg>${c.video_duration ? ' ' + Number(c.video_duration).toFixed(0) + 's' : ''}</div>` : '';
       const healthColor = c.health >= 70 ? '#22c55e' : c.health >= 40 ? '#eab308' : '#ef4444';
 
       return `<div class="creative-card" onclick="openCreativeModal('${c.ad_id}')">
-        <div class="card-thumb">${thumbImg}</div>
+        <div class="card-thumb">${thumbImg}${videoBadge}</div>
         <div class="card-body">
           <div class="card-badges">
             <span class="badge" style="background:${prc}20;color:${prc}">${c.product || 'Other'}</span>
@@ -1622,8 +1671,9 @@ function renderTable() {
     const ltCtr = Number(c.lifetime_ctr) || 0;
     const days = Number(c.days_active) || 0;
 
-    const thumbCell = c.thumb
-      ? `<img src="${c.thumb}" width="44" height="44" style="border-radius:6px;object-fit:cover;flex-shrink:0" loading="lazy" onerror="this.style.display='none'">`
+    const thumbSrc = c.hd_thumbnail_url || c.image_url || c.thumb;
+    const thumbCell = thumbSrc
+      ? `<img src="${thumbSrc}" class="table-thumb" loading="lazy" onerror="this.style.display='none'">`
       : '<div class="thumb-placeholder">\uD83D\uDCC4</div>';
 
     return `<tr data-phase="${phase}" data-product="${product}" data-format="${fmt}" data-action="${action}" data-name="${name}" data-ad-id="${c.ad_id}" onclick="openCreativeModal('${c.ad_id}')" style="cursor:pointer">
@@ -1992,16 +2042,37 @@ function openCreativeModal(adId) {
   const mediaEl = document.getElementById('modalMedia');
   const detailsEl = document.getElementById('modalDetails');
 
-  const hdThumb = c.hd_thumbnail_url || c.thumb;
+  const hdThumb = c.hd_thumbnail_url || c.image_url || c.thumb;
   const isVideo = !!c.video_id;
+  const videoSrc = c.video_source_url || '';
+  const fbVideoUrl = c.video_id ? `https://www.facebook.com/ads/library/?id=${adId}` : '';
+  const durationLabel = c.video_duration ? Number(c.video_duration).toFixed(0) + 's' : '';
 
-  if (isVideo && hdThumb) {
-    mediaEl.innerHTML = `<img src="${hdThumb}" alt="" style="max-width:100%;max-height:80vh;object-fit:contain" onerror="this.src='';this.alt='No image'">
-      ${c.video_duration ? '<div style="position:absolute;bottom:12px;left:12px;background:rgba(0,0,0,0.7);color:#fff;padding:4px 10px;border-radius:6px;font-size:12px">\uD83C\uDFA5 ' + Number(c.video_duration).toFixed(1) + 's</div>' : ''}`;
+  if (isVideo && videoSrc) {
+    // Direct video playback
+    mediaEl.innerHTML = `<div class="modal-video-wrap">
+      <video id="modalVideo" poster="${hdThumb || ''}" preload="metadata" playsinline>
+        <source src="${videoSrc}" type="video/mp4">
+      </video>
+      <div class="video-play-overlay" id="videoPlayBtn" onclick="toggleModalVideo()">
+        <svg width="24" height="28" viewBox="0 0 24 28" fill="white"><polygon points="0,0 24,14 0,28"/></svg>
+      </div>
+      ${durationLabel ? `<div class="video-meta-badge">\uD83C\uDFA5 ${durationLabel}</div>` : ''}
+    </div>`;
+  } else if (isVideo && hdThumb) {
+    // Video without source URL — show thumbnail + link to FB
+    mediaEl.innerHTML = `<div class="modal-video-wrap">
+      <img src="${hdThumb}" alt="" style="max-width:100%;max-height:80vh;object-fit:contain" onerror="this.src='';this.alt='No image'">
+      <a href="${fbVideoUrl}" target="_blank" class="video-play-overlay" title="Watch on Facebook">
+        <svg width="24" height="28" viewBox="0 0 24 28" fill="white"><polygon points="0,0 24,14 0,28"/></svg>
+      </a>
+      ${durationLabel ? `<div class="video-meta-badge">\uD83C\uDFA5 ${durationLabel}</div>` : ''}
+      <a href="${fbVideoUrl}" target="_blank" class="video-fb-link">Watch on Facebook \u2197</a>
+    </div>`;
   } else if (hdThumb) {
     mediaEl.innerHTML = `<img src="${hdThumb}" alt="" style="max-width:100%;max-height:80vh;object-fit:contain" onerror="this.src='';this.alt='No image'">`;
   } else {
-    mediaEl.innerHTML = '<div style="color:#6B7280;font-size:48px">\uD83D\uDCC4</div>';
+    mediaEl.innerHTML = '<div style="color:var(--text-muted);font-size:48px">\uD83D\uDCC4</div>';
   }
 
   const roas7d = c.roas_7d || 0;
@@ -2067,6 +2138,21 @@ function openCreativeModal(adId) {
   document.body.style.overflow = 'hidden';
 }
 
+function toggleModalVideo() {
+  const vid = document.getElementById('modalVideo');
+  const btn = document.getElementById('videoPlayBtn');
+  if (!vid) return;
+  if (vid.paused) {
+    vid.play();
+    btn.classList.add('hidden');
+    vid.addEventListener('pause', () => btn.classList.remove('hidden'), { once: true });
+    vid.addEventListener('ended', () => { btn.classList.remove('hidden'); vid.currentTime = 0; }, { once: true });
+    vid.addEventListener('click', () => vid.pause());
+  } else {
+    vid.pause();
+  }
+}
+
 function closeCreativeModal() {
   document.getElementById('creativeModal').classList.remove('active');
   document.body.style.overflow = '';
@@ -2079,7 +2165,23 @@ document.addEventListener('keydown', (e) => {
 });
 
 // ── Init: check session on page load ──
-checkSession();
+// Dev bypass: skip auth during development
+if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+  document.getElementById('loginOverlay').classList.add('hidden');
+  const SB_STORAGE = 'https://dyktmiyvpnayqwwlqspe.supabase.co/storage/v1/object/public/brand-assets/logos';
+  allWorkspaces = [
+    { workspace_id: 'de8e2554-729a-422e-894d-ce399eca3a41', name: 'Varalife', slug: 'varalife', meta_ad_account: 'act_1215738472466123', logo_url: `${SB_STORAGE}/varalife.svg`, currency: 'INR' },
+    { workspace_id: '67d68822-7a64-4ccd-b664-7e5dc5088c52', name: 'Stylish Wodrobe', slug: 'stylish-wodrobe', meta_ad_account: 'act_1473716013642041', logo_url: `${SB_STORAGE}/stylish-wodrobe.svg`, currency: 'INR' },
+    { workspace_id: 'a7660de1-abe6-4b2c-a2b0-35f9c760e787', name: 'The Good Leaf', slug: 'the-good-leaf', meta_ad_account: 'act_710963902784708', logo_url: `${SB_STORAGE}/the-good-leaf.svg`, currency: 'INR' },
+    { workspace_id: '684472b5-fbae-413e-97d6-fc7e1a2a2084', name: 'Uni Seoul', slug: 'uni-seoul', meta_ad_account: 'act_1386984256537337', logo_url: `${SB_STORAGE}/uni-seoul.svg`, currency: 'INR' }
+  ];
+  const lastSlug = localStorage.getItem('dp_workspace');
+  currentWorkspace = allWorkspaces.find(w => w.slug === lastSlug) || allWorkspaces[0];
+  renderBrandSwitcher();
+  loadDashboard();
+} else {
+  checkSession();
+}
 </script>
 
 </body>
