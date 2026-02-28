@@ -2525,7 +2525,8 @@ function openCreativeModal(adId) {
   const mediaEl = document.getElementById('modalMedia');
   const detailsEl = document.getElementById('modalDetails');
 
-  const hdThumb = c.hd_thumbnail_url || c.image_url || c.thumb;
+  const vertThumb = c.vertical_thumbnail_url;
+  const hdThumb = vertThumb || c.hd_thumbnail_url || c.image_url || c.thumb;
   const isVideo = !!c.video_id;
   const videoSrc = c.video_source_url || '';
   const fbVideoUrl = c.video_id ? `https://www.facebook.com/ads/library/?id=${adId}` : '';
@@ -2536,7 +2537,7 @@ function openCreativeModal(adId) {
   modalBox.classList.toggle('modal-vertical', isVertical);
 
   if (isVideo && hdThumb) {
-    // Show vertical thumbnail with play overlay — click plays video inline or opens FB
+    // Show vertical thumbnail (prefer 9:16 reels thumb) with play overlay
     const playAction = videoSrc
       ? `onclick="playModalVideo(this, '${videoSrc.replace(/'/g, "\\'")}')"`
       : (c.video_id ? `onclick="playModalEmbed(this, '${c.video_id}')"` : '');
