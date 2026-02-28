@@ -127,6 +127,61 @@
     font-weight: 700; font-size: 14px; color: var(--accent-light);
     margin-right: 16px; white-space: nowrap;
   }
+
+  /* ── Brand Switcher ── */
+  .brand-switcher { position: relative; }
+  .brand-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; padding: 6px 10px; border-radius: 8px;
+    transition: all 0.15s;
+  }
+  .brand-btn:hover { background: var(--bg-card); }
+  .brand-btn .brand-name {
+    font-weight: 700; font-size: 14px; color: var(--accent-light);
+    white-space: nowrap;
+  }
+  .brand-btn .brand-caret {
+    font-size: 10px; color: var(--text-muted); transition: transform 0.15s;
+  }
+  .brand-btn.open .brand-caret { transform: rotate(180deg); }
+  .brand-logo {
+    width: 22px; height: 22px; border-radius: 6px; object-fit: cover;
+    background: var(--bg-card-hover); flex-shrink: 0;
+  }
+  .brand-logo-placeholder {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .brand-dd {
+    display: none; position: fixed;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 10px; box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    z-index: 1000; min-width: 220px; padding: 6px 0;
+    overflow: hidden;
+  }
+  .brand-dd.open { display: block; }
+  .brand-option {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 16px; cursor: pointer; transition: all 0.1s;
+    border: none; background: none; width: 100%;
+    font-family: inherit; text-align: left;
+  }
+  .brand-option:hover { background: var(--bg-card-hover); }
+  .brand-option.active { background: rgba(99,102,241,0.15); }
+  .brand-option .bo-name {
+    font-size: 13px; font-weight: 500; color: var(--text);
+  }
+  .brand-option.active .bo-name { color: var(--accent-light); font-weight: 600; }
+  .brand-option .bo-meta {
+    font-size: 11px; color: var(--text-dim);
+  }
+  .brand-option .bo-check {
+    margin-left: auto; color: var(--accent); font-size: 14px; display: none;
+  }
+  .brand-option.active .bo-check { display: inline; }
   .nav-right {
     margin-left: auto; display: flex; align-items: center; gap: 12px;
   }
@@ -606,7 +661,14 @@
 <!-- Nav -->
 <nav class="nav">
   <div class="nav-inner">
-    <span class="nav-brand">Varalife Creative Hub</span>
+    <div class="brand-switcher" id="brandSwitcher">
+      <button class="brand-btn" id="brandBtn" onclick="toggleBrandPicker()">
+        <span class="brand-logo-placeholder" id="brandLogo">V</span>
+        <span class="brand-name" id="brandName">Loading...</span>
+        <span class="brand-caret">&#9662;</span>
+      </button>
+      <div class="brand-dd" id="brandDropdown"></div>
+    </div>
     <a href="#overview" class="nav-tab" onclick="scrollTo_(event,'overview')">Overview</a>
     <a href="#swimlanes" class="nav-tab" onclick="scrollTo_(event,'swimlanes')">Swim Lanes</a>
     <a href="#table" class="nav-tab active" onclick="scrollTo_(event,'table')">Table</a>
@@ -795,11 +857,10 @@
 // ── Config ──
 const SUPABASE_URL = 'https://dyktmiyvpnayqwwlqspe.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5a3RtaXl2cG5heXF3d2xxc3BlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1OTUxOTIsImV4cCI6MjA4NzE3MTE5Mn0.2Ij_ZJs_VJPFhy81Vm_bm6J8RCjI3t4rKICAr00IRYs';
-const ACCOUNT_ID = 'act_1215738472466123';
-const WORKSPACE_ID = 'de8e2554-729a-422e-894d-ce399eca3a41';
-
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let DATA = { daily: [], creatives: [], actionColors: {}, phaseColors: {} };
+let currentWorkspace = null;
+let allWorkspaces = [];
 
 // ── Date Picker State ──
 let dpMode = 'rolling'; // 'rolling' or 'fixed'
@@ -986,11 +1047,80 @@ function applyDatePicker() {
   refreshDashboard();
 }
 
+// ── Brand Switcher ──
+async function loadWorkspaces() {
+  const { data, error } = await sb.rpc('dashboard_workspaces');
+  if (error) { console.error('workspaces error:', error); return; }
+  allWorkspaces = data || [];
+  const lastSlug = localStorage.getItem('dp_workspace');
+  currentWorkspace = allWorkspaces.find(w => w.slug === lastSlug) || allWorkspaces[0];
+  renderBrandSwitcher();
+}
+
+function renderBrandSwitcher() {
+  if (!currentWorkspace) return;
+  const initial = currentWorkspace.name.charAt(0).toUpperCase();
+  const logoEl = document.getElementById('brandLogo');
+  if (currentWorkspace.logo_url) {
+    logoEl.outerHTML = `<img class="brand-logo" id="brandLogo" src="${currentWorkspace.logo_url}" alt="">`;
+  } else {
+    logoEl.outerHTML = `<span class="brand-logo-placeholder" id="brandLogo">${initial}</span>`;
+  }
+  document.getElementById('brandName').textContent = currentWorkspace.name;
+
+  const dd = document.getElementById('brandDropdown');
+  dd.innerHTML = allWorkspaces.map(w => {
+    const active = w.workspace_id === currentWorkspace.workspace_id;
+    const initial = w.name.charAt(0).toUpperCase();
+    const logo = w.logo_url
+      ? `<img class="brand-logo" src="${w.logo_url}" alt="">`
+      : `<span class="brand-logo-placeholder">${initial}</span>`;
+    return `<button class="brand-option${active ? ' active' : ''}" onclick="selectBrand('${w.slug}')">
+      ${logo}
+      <div><div class="bo-name">${w.name}</div><div class="bo-meta">${w.slug}</div></div>
+      <span class="bo-check">&#10003;</span>
+    </button>`;
+  }).join('');
+}
+
+function toggleBrandPicker() {
+  const dd = document.getElementById('brandDropdown');
+  const btn = document.getElementById('brandBtn');
+  if (dd.classList.contains('open')) { closeBrandPicker(); return; }
+  const rect = btn.getBoundingClientRect();
+  dd.style.top = (rect.bottom + 6) + 'px';
+  dd.style.left = rect.left + 'px';
+  dd.classList.add('open');
+  btn.classList.add('open');
+  setTimeout(() => document.addEventListener('click', closeBrandOutside), 10);
+}
+
+function closeBrandPicker() {
+  document.getElementById('brandDropdown').classList.remove('open');
+  document.getElementById('brandBtn').classList.remove('open');
+  document.removeEventListener('click', closeBrandOutside);
+}
+
+function closeBrandOutside(e) {
+  if (!document.getElementById('brandSwitcher').contains(e.target)) closeBrandPicker();
+}
+
+function selectBrand(slug) {
+  const ws = allWorkspaces.find(w => w.slug === slug);
+  if (!ws || ws.workspace_id === currentWorkspace.workspace_id) { closeBrandPicker(); return; }
+  currentWorkspace = ws;
+  localStorage.setItem('dp_workspace', ws.slug);
+  closeBrandPicker();
+  renderBrandSwitcher();
+  refreshDashboard();
+}
+
 // ── Auth ──
 async function checkSession() {
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
     document.getElementById('loginOverlay').classList.add('hidden');
+    await loadWorkspaces();
     await loadDashboard();
   }
 }
@@ -1013,6 +1143,7 @@ async function handleLogin() {
     return;
   }
   document.getElementById('loginOverlay').classList.add('hidden');
+  await loadWorkspaces();
   await loadDashboard();
 }
 
@@ -1085,7 +1216,7 @@ async function loadDashboard() {
   document.getElementById('loadingOverlay').classList.remove('hidden');
 
   // Build daily params based on date picker (fetch 2x for comparison)
-  const dailyParams = { p_account_id: ACCOUNT_ID };
+  const dailyParams = { p_account_id: currentWorkspace.meta_ad_account };
   if (dpStartDate && dpEndDate) {
     // For fixed range, compute duration and fetch 2x for prior comparison
     const startD = new Date(dpStartDate), endD = new Date(dpEndDate);
@@ -1099,8 +1230,8 @@ async function loadDashboard() {
 
   const [dailyRes, creativesRes, ad7dRes] = await Promise.all([
     sb.rpc('dashboard_daily', dailyParams),
-    sb.rpc('dashboard_creatives', { p_workspace_id: WORKSPACE_ID }),
-    sb.rpc('dashboard_ad_7d', { p_account_id: ACCOUNT_ID, p_limit: 200 })
+    sb.rpc('dashboard_creatives', { p_workspace_id: currentWorkspace.workspace_id }),
+    sb.rpc('dashboard_ad_7d', { p_account_id: currentWorkspace.meta_ad_account, p_limit: 200 })
   ]);
 
   if (dailyRes.error) { console.error('daily error:', dailyRes.error); }
@@ -1181,7 +1312,8 @@ function renderHero() {
   const count = DATA.creatives.length;
   const portfolioHealth = computePortfolioHealth(DATA.creatives);
   const periodLabel = document.getElementById('dpLabel').textContent;
-  document.getElementById('heroSub').textContent = `Live performance intelligence for ${count} active creatives \u2022 ${periodLabel}`;
+  const brandName = currentWorkspace ? currentWorkspace.name : '';
+  document.getElementById('heroSub').textContent = `${brandName} \u2022 ${count} active creatives \u2022 ${periodLabel}`;
   document.getElementById('portfolioScore').textContent = portfolioHealth + '/100';
 }
 
