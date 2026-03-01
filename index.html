@@ -836,8 +836,12 @@
   .modal-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   .modal-metric { background: var(--bg); border-radius: 8px; padding: 12px; }
   .modal-metric .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
-  .modal-metric .value { font-size: 18px; font-weight: 700; color: var(--text); margin-top: 2px; }
+  .modal-metric .value { font-size: 18px; font-weight: 700; color: var(--text); margin-top: 2px; display: flex; align-items: center; gap: 8px; }
   .modal-metric .sub { font-size: 11px; color: var(--text-muted); }
+  .modal-metric .trend-badge { font-size: 11px; font-weight: 600; padding: 2px 6px; border-radius: 4px; white-space: nowrap; }
+  .modal-metric .trend-badge.up { background: #dcfce7; color: #16a34a; }
+  .modal-metric .trend-badge.down { background: #fee2e2; color: #dc2626; }
+  .modal-metric .trend-badge.flat { background: #f3f4f6; color: #6b7280; }
   .modal-adcopy { font-size: 13px; color: var(--text); line-height: 1.6; white-space: pre-wrap; max-height: 200px; overflow-y: auto; background: var(--bg); border-radius: 8px; padding: 12px; }
   .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
   .modal-btn {
@@ -2575,9 +2579,27 @@ function openCreativeModal(adId) {
   const product = c.product || 'Other';
   const fmt = c.format || 'Other';
   const daysActive = Number(c.days_active) || 0;
-  const ctr = Number(c.lifetime_ctr) || 0;
+  const ctr7d = Number(c.ctr_7d) || 0;
   const cpm = Number(c.lifetime_cpm) || 0;
-  const cpp = Number(c.lifetime_cpp) || 0;
+  const cpp7d = Number(c.cpp_7d) || 0;
+
+  // Period-over-period % change (current 7d vs previous 7d)
+  function pctChange(curr, prev, invertColor) {
+    if (!prev || prev === 0) return '';
+    const pct = ((curr - prev) / prev) * 100;
+    const abs = Math.abs(pct).toFixed(0);
+    if (abs < 3) return '<span class="trend-badge flat">\u2192 flat</span>';
+    const isUp = pct > 0;
+    // For cost metrics (CPP, spend), up = bad (red), down = good (green)
+    const cls = invertColor ? (isUp ? 'down' : 'up') : (isUp ? 'up' : 'down');
+    const arrow = isUp ? '\u2191' : '\u2193';
+    return '<span class="trend-badge ' + cls + '">' + arrow + ' ' + abs + '%</span>';
+  }
+
+  const roasTrend = pctChange(roas7d, Number(c.prev_roas_7d) || 0, false);
+  const spendTrend = pctChange(spend7d, Number(c.prev_spend_7d) || 0, false);
+  const ctrTrend = pctChange(ctr7d, Number(c.prev_ctr_7d) || 0, false);
+  const cppTrend = pctChange(cpp7d, Number(c.prev_cpp_7d) || 0, true);
 
   const ac = DATA.actionColors[action] || '#6B7280';
   const pc = DATA.phaseColors[(phase || '').toLowerCase()] || '#6B7280';
@@ -2594,15 +2616,15 @@ function openCreativeModal(adId) {
     </div>
 
     <div class="modal-section">
-      <div class="modal-section-title">Performance</div>
+      <div class="modal-section-title">Performance <span style="font-size:10px;color:var(--text-muted);font-weight:400">vs prev 7d</span></div>
       <div class="modal-metrics">
-        <div class="modal-metric"><div class="label">7d ROAS</div><div class="value" style="color:${roas7d >= 2 ? '#22c55e' : roas7d >= 1 ? '#eab308' : '#ef4444'}">${roas7d.toFixed(2)}x</div></div>
+        <div class="modal-metric"><div class="label">7d ROAS</div><div class="value" style="color:${roas7d >= 2 ? '#22c55e' : roas7d >= 1 ? '#eab308' : '#ef4444'}">${roas7d.toFixed(2)}x ${roasTrend}</div></div>
         <div class="modal-metric"><div class="label">Lifetime ROAS</div><div class="value">${ltRoas.toFixed(2)}x</div></div>
-        <div class="modal-metric"><div class="label">7d Spend</div><div class="value">${fmtCurrency(spend7d)}</div></div>
+        <div class="modal-metric"><div class="label">7d Spend</div><div class="value">${fmtCurrency(spend7d)} ${spendTrend}</div></div>
         <div class="modal-metric"><div class="label">Total Spend</div><div class="value">${fmtCurrency(ltSpend)}</div></div>
-        <div class="modal-metric"><div class="label">CTR</div><div class="value">${(ctr * 100).toFixed(2)}%</div></div>
+        <div class="modal-metric"><div class="label">7d CTR</div><div class="value">${(ctr7d * 100).toFixed(2)}% ${ctrTrend}</div></div>
         <div class="modal-metric"><div class="label">CPM</div><div class="value">${fmtCurrency(cpm)}</div></div>
-        <div class="modal-metric"><div class="label">Cost/Purchase</div><div class="value">${fmtCurrency(cpp)}</div></div>
+        <div class="modal-metric"><div class="label">7d Cost/Purchase</div><div class="value">${fmtCurrency(cpp7d)} ${cppTrend}</div></div>
         <div class="modal-metric"><div class="label">Days Active</div><div class="value">${daysActive}</div></div>
       </div>
     </div>
