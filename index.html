@@ -1828,15 +1828,15 @@ function renderCampaignBreakdown() {
     document.getElementById('bd-campaign').innerHTML = '<p style="color:var(--text-muted);padding:20px">No campaign data available</p>';
     return;
   }
-  const totalSpend = campaigns.reduce((s, c) => s + Number(c.lifetime_spend), 0);
-  const maxSpend = Math.max(...campaigns.map(c => Number(c.lifetime_spend)));
+  const totalSpend = campaigns.reduce((s, c) => s + Number(c.lt_spend), 0);
+  const maxSpend = Math.max(...campaigns.map(c => Number(c.lt_spend)));
   const currency = currentWorkspace.currency === 'INR' ? '\u20B9' : '$';
 
   // Group by funnel stage for summary row
   const rows = campaigns.map(c => {
-    const spend = Number(c.lifetime_spend);
-    const rev = Number(c.lifetime_revenue);
-    const roas = Number(c.lifetime_roas);
+    const spend = Number(c.lt_spend);
+    const rev = Number(c.lt_revenue);
+    const roas = Number(c.lt_roas);
     const s7d = Number(c.spend_7d);
     const r7d = Number(c.roas_7d);
     const pct = totalSpend > 0 ? ((spend / totalSpend) * 100).toFixed(1) : '0';
@@ -1845,8 +1845,8 @@ function renderCampaignBreakdown() {
     return `<tr class="${hasAdsets ? 'bd-expand-row' : ''}" ${hasAdsets ? `onclick="toggleAdsets('${c.campaign_id}')"` : ''}>
       <td class="td-name">${hasAdsets ? '<span class="bd-expand-icon" id="expand-' + c.campaign_id + '">&#9654;</span>' : '<span style="width:16px;display:inline-block"></span>'}${c.campaign_name}</td>
       <td>${funnelBadge(c.funnel_stage)}</td>
-      <td><span class="funnel-badge other">${c.product_focus}</span></td>
-      <td class="td-num">${c.ad_count} <span style="color:var(--text-dim);font-size:10px">(${c.active_ads} live)</span></td>
+      <td><span class="funnel-badge other">${c.product_line}</span></td>
+      <td class="td-num">${c.ad_count} <span style="color:var(--text-dim);font-size:10px">(${c.active_count} live)</span></td>
       <td class="td-num">${c.adset_count}</td>
       <td class="td-num">${fmtCurrency(spend)} ${shareBar(spend, maxSpend)}</td>
       <td class="td-num">${pct}%</td>
@@ -1874,7 +1874,7 @@ function renderCampaignBreakdown() {
   }).join('');
 
   // Summary row
-  const totalRev = campaigns.reduce((s, c) => s + Number(c.lifetime_revenue), 0);
+  const totalRev = campaigns.reduce((s, c) => s + Number(c.lt_revenue), 0);
   const totalRoas = totalSpend > 0 ? (totalRev / totalSpend) : 0;
   const total7d = campaigns.reduce((s, c) => s + Number(c.spend_7d), 0);
   const totalRev7d = campaigns.reduce((s, c) => s + Number(c.revenue_7d), 0);
