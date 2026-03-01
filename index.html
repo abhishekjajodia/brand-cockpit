@@ -1091,7 +1091,7 @@
     <button class="audience-tab" onclick="switchAudienceTab(this,'gender')">Gender</button>
     <button class="audience-tab" onclick="switchAudienceTab(this,'publisher_platform')">Platform</button>
     <button class="audience-tab" onclick="switchAudienceTab(this,'device_platform')">Device</button>
-    <button class="audience-tab" onclick="switchAudienceTab(this,'country')">Country</button>
+    <button class="audience-tab" onclick="switchAudienceTab(this,'region')">Region</button>
   </div>
   <div id="audienceContainer" class="fade-in"></div>
 </div>
@@ -1462,7 +1462,23 @@ function classifyCreative(row, ad7dMap) {
   const fatigueScoreVal = (fatigueHealth / 100) * 20;
   const health = Math.min(100, Math.round(roasScore + ctrScore + recencyScore + fatigueScoreVal));
   return { action, health, roas_7d: +roas7d.toFixed(2), spend_7d: +spend7d.toFixed(2),
-           ctr_7d: +ctrUse.toFixed(2), roas_trend: roasTrend, roas_delta: +roasDelta.toFixed(1) };
+           roas_trend: roasTrend, roas_delta: +roasDelta.toFixed(1) };
+}
+
+// Parse ad name: {Product} - {Date?} - {Format} - {Hook}
+function parseAdName(adName) {
+  if (!adName) return { hook: 'Unknown', launchDate: '' };
+  const parts = adName.split(' - ').map(p => p.trim());
+  const dateRx = /^\d{1,2}\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)(\s+\d{2,4})?$/i;
+  const fmtRx = /^(Image|Video|Carousel)$/i;
+  let launchDate = '';
+  const hookParts = [];
+  for (let i = 1; i < parts.length; i++) {
+    if (dateRx.test(parts[i])) launchDate = parts[i];
+    else if (fmtRx.test(parts[i])) { /* skip — already in badges/format column */ }
+    else hookParts.push(parts[i]);
+  }
+  return { hook: hookParts.length > 0 ? hookParts.join(' – ') : adName, launchDate };
 }
 
 function computePortfolioHealth(creatives) {
@@ -1730,7 +1746,7 @@ function renderSwimLanes() {
             <span class="badge" style="background:${prc}20;color:${prc}">${c.product || 'Other'}</span>
             <span class="badge" style="background:#F0F0F0;color:#6B7280">${c.format || 'Other'}</span>
           </div>
-          <div class="card-name" title="${c.ad_name || ''}">${c.ad_name || 'Unknown'}</div>
+          <div class="card-name" title="${c.ad_name || ''}">${parseAdName(c.ad_name).hook}</div>
           <div class="card-metrics">
             <div class="cm"><div class="cm-label">ROAS</div><div class="cm-val">${(Number(c.lifetime_roas) || 0).toFixed(2)}x</div></div>
             <div class="cm"><div class="cm-label">Spend</div><div class="cm-val">${fmtCurrency(c.lifetime_spend)}</div></div>
@@ -2051,7 +2067,7 @@ function renderTable() {
       : '<div class="thumb-placeholder">\uD83D\uDCC4</div>';
 
     return `<tr data-phase="${phase}" data-product="${product}" data-format="${fmt}" data-action="${action}" data-name="${name}" data-ad-id="${c.ad_id}" onclick="openCreativeModal('${c.ad_id}')" style="cursor:pointer">
-      <td class="td-creative"><div class="creative-cell">${thumbCell}<div class="creative-info"><span class="table-name">${c.ad_name || 'Unknown'}</span><span class="table-sub">${fmtIcon(c.format)} ${c.format || 'Other'}</span></div></div></td>
+      <td class="td-creative"><div class="creative-cell">${thumbCell}<div class="creative-info"><span class="table-name">${parseAdName(c.ad_name).hook}</span><span class="table-sub">${fmtIcon(c.format)} ${c.format || 'Other'}${parseAdName(c.ad_name).launchDate ? ' · ' + parseAdName(c.ad_name).launchDate : ''}</span></div></div></td>
       <td><span class="badge-sm" style="background:${prc}20;color:${prc}">${c.product || 'Other'}</span></td>
       <td><span class="badge-sm" style="background:${pc}20;color:${pc}">${c.lifecycle_phase || 'Unknown'}</span></td>
       <td data-sort="${ltSpend}" class="td-num">${fmtCurrency(ltSpend)}</td>
@@ -2059,7 +2075,7 @@ function renderTable() {
       <td data-sort="${ltRoas}" class="td-num">${ltRoas.toFixed(2)}x</td>
       <td data-sort="${c.roas_7d}" class="td-num" style="color:${trendColor}">${c.roas_7d.toFixed(2)}x ${trendIcon}</td>
       <td data-sort="${ltCpp}" class="td-num">${fmtCurrency(ltCpp)}</td>
-      <td data-sort="${ltCtr}" class="td-num">${(ltCtr * 100).toFixed(2)}%</td>
+      <td data-sort="${ltCtr}" class="td-num">${ltCtr.toFixed(2)}%</td>
       <td data-sort="${days}" class="td-num">${days}d</td>
       <td data-sort="${c.health}" class="td-num"><div class="health-bar-table"><div style="width:${c.health}%;height:100%;background:${healthColor};border-radius:4px"></div></div><span class="health-num">${c.health}</span></td>
       <td><span class="action-badge-sm" style="background:${ac}20;color:${ac}">${c.action}</span></td>
@@ -2606,8 +2622,11 @@ function openCreativeModal(adId) {
 
   const adLibraryUrl = c.ad_library_url || `https://www.facebook.com/ads/library/?id=${adId}`;
 
+  const parsed = parseAdName(c.ad_name);
+
   detailsEl.innerHTML = `
-    <div class="modal-title">${c.ad_name || 'Unknown'}</div>
+    <div class="modal-title">${parsed.hook}</div>
+    ${parsed.launchDate ? `<div style="font-size:12px;color:var(--text-muted);margin:-4px 0 8px 0">Launched ${parsed.launchDate}</div>` : ''}
     <div class="modal-badges">
       <span class="badge" style="background:${ac}20;color:${ac}">${action}</span>
       <span class="badge" style="background:${pc}20;color:${pc}">${phase}</span>
