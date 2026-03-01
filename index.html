@@ -663,6 +663,14 @@
   }
   .audience-tab:hover { border-color: var(--accent); color: var(--text); }
   .audience-tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .audience-subtabs { display: flex; gap: 6px; margin: -16px 0 20px 0; }
+  .audience-subtab {
+    padding: 5px 12px; border-radius: var(--radius-pill); border: 1px solid var(--border);
+    background: var(--bg); color: var(--text-muted); cursor: pointer;
+    font-size: 11px; font-family: inherit; transition: all 0.15s;
+  }
+  .audience-subtab:hover { border-color: var(--accent); color: var(--text); }
+  .audience-subtab.active { background: var(--accent-light, #EDE9FE); color: var(--accent); border-color: var(--accent); font-weight: 600; }
   .audience-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
   .segment-card {
     background: var(--bg-card); border: 1px solid var(--border);
@@ -1090,8 +1098,12 @@
     <button class="audience-tab active" onclick="switchAudienceTab(this,'age')">Age</button>
     <button class="audience-tab" onclick="switchAudienceTab(this,'gender')">Gender</button>
     <button class="audience-tab" onclick="switchAudienceTab(this,'publisher_platform')">Platform</button>
-    <button class="audience-tab" onclick="switchAudienceTab(this,'device_platform')">Device</button>
     <button class="audience-tab" onclick="switchAudienceTab(this,'region')">Region</button>
+  </div>
+  <div class="audience-subtabs" id="audienceSubtabs" style="display:none">
+    <button class="audience-subtab active" onclick="switchAudienceSubtab(this,'publisher_platform')">By Platform</button>
+    <button class="audience-subtab" onclick="switchAudienceSubtab(this,'device_platform')">By Device</button>
+    <button class="audience-subtab" onclick="switchAudienceSubtab(this,'platform_position')">By Placement</button>
   </div>
   <div id="audienceContainer" class="fade-in"></div>
 </div>
@@ -2266,7 +2278,11 @@ function renderAudienceSegments(type) {
 
   const nameMap = { mobile_app: 'Mobile App', mobile_web: 'Mobile Web', desktop: 'Desktop',
     instagram: 'Instagram', facebook: 'Facebook', messenger: 'Messenger', threads: 'Threads',
-    audience_network: 'Audience Network', unknown: 'Unknown', IN: 'India', US: 'United States' };
+    audience_network: 'Audience Network', unknown: 'Unknown', IN: 'India', US: 'United States',
+    feed: 'Feed', story: 'Stories', reels: 'Reels', explore: 'Explore', search: 'Search',
+    marketplace: 'Marketplace', video_feeds: 'Video Feeds', right_hand_column: 'Right Column',
+    instant_article: 'Instant Article', instream_video: 'In-Stream Video',
+    rewarded_video: 'Rewarded Video', an_classic: 'Audience Network' };
 
   function roasColor(r) { return r >= 2 ? '#22c55e' : r >= 1.5 ? '#3b82f6' : r >= 1 ? '#eab308' : '#ef4444'; }
   function fmtM(v) { v = Number(v); if (v >= 100000) return (v/100000).toFixed(1) + 'L'; if (v >= 1000) return (v/1000).toFixed(1) + 'K'; return v.toFixed(0); }
@@ -2292,6 +2308,21 @@ function renderAudienceSegments(type) {
 
 function switchAudienceTab(btn, type) {
   document.querySelectorAll('.audience-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const subtabs = document.getElementById('audienceSubtabs');
+  if (type === 'publisher_platform') {
+    subtabs.style.display = 'flex';
+    // Reset subtabs to "By Platform" active
+    document.querySelectorAll('.audience-subtab').forEach(t => t.classList.remove('active'));
+    document.querySelector('.audience-subtab').classList.add('active');
+  } else {
+    subtabs.style.display = 'none';
+  }
+  renderAudienceSegments(type);
+}
+
+function switchAudienceSubtab(btn, type) {
+  document.querySelectorAll('.audience-subtab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   renderAudienceSegments(type);
 }
