@@ -1713,7 +1713,7 @@ function renderSwimLanes() {
       const prc = c.product === 'Varapace' ? '#8A38F5' : c.product === 'Varaspan' ? '#06b6d4' : c.product === 'VaraCare' ? '#22c55e' : '#6B7280';
       const trendIcon = c.roas_trend === 'up' ? '\u2191' : c.roas_trend === 'down' ? '\u2193' : '\u2192';
       const trendColor = c.roas_trend === 'up' ? '#22c55e' : c.roas_trend === 'down' ? '#ef4444' : '#6B7280';
-      const thumbSrc = c.hd_thumbnail_url || c.image_url || c.thumb;
+      const thumbSrc = c.stored_thumbnail_url || c.hd_thumbnail_url || c.image_url || c.thumb;
       const thumbImg = thumbSrc ? `<img src="${thumbSrc}" style="width:100%;height:100%;object-fit:cover" loading="lazy" onerror="this.style.display='none'">` : '';
       const isVideo = !!c.video_id;
       const videoBadge = isVideo ? `<div class="video-badge"><svg width="8" height="10" viewBox="0 0 8 10" fill="white"><polygon points="0,0 8,5 0,10"/></svg>${c.video_duration ? ' ' + Number(c.video_duration).toFixed(0) + 's' : ''}</div>` : '';
@@ -2041,7 +2041,7 @@ function renderTable() {
     const ltCtr = Number(c.lifetime_ctr) || 0;
     const days = Number(c.days_active) || 0;
 
-    const thumbSrc = c.hd_thumbnail_url || c.image_url || c.thumb;
+    const thumbSrc = c.stored_thumbnail_url || c.hd_thumbnail_url || c.image_url || c.thumb;
     const thumbCell = thumbSrc
       ? `<img src="${thumbSrc}" class="table-thumb" loading="lazy" onerror="this.style.display='none'">`
       : '<div class="thumb-placeholder">\uD83D\uDCC4</div>';
@@ -2525,8 +2525,8 @@ function openCreativeModal(adId) {
   const mediaEl = document.getElementById('modalMedia');
   const detailsEl = document.getElementById('modalDetails');
 
-  const hasReels = !!c.vertical_thumbnail_url;
-  const hdThumb = hasReels ? c.vertical_thumbnail_url : (c.hd_thumbnail_url || c.image_url || c.thumb);
+  const hasReels = !!(c.stored_vertical_thumb_url || c.vertical_thumbnail_url);
+  const hdThumb = hasReels ? (c.stored_vertical_thumb_url || c.vertical_thumbnail_url) : (c.stored_thumbnail_url || c.hd_thumbnail_url || c.image_url || c.thumb);
   const isVideo = !!c.video_id;
   const videoSrc = c.video_source_url || '';
   const fbVideoUrl = c.video_id ? `https://www.facebook.com/ads/library/?id=${adId}` : '';
